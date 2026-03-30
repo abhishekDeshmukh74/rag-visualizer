@@ -40,9 +40,9 @@ export default function ControlBar({
   onStepClick,
 }: ControlBarProps) {
   return (
-    <div className="flex items-center gap-3 bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/40 px-4 py-2.5">
-      {/* Pipeline step indicators */}
-      <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2 sm:gap-3 bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/40 px-3 sm:px-4 py-2.5 w-full sm:w-auto">
+      {/* Pipeline step indicators — scrollable on mobile */}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 sm:flex-none min-w-0">
         {PIPELINE_STEPS.map((step, i) => {
           const isCompleted = completedSteps.includes(step.id);
           const isProcessing = processingStep === step.id;
@@ -53,10 +53,10 @@ export default function ControlBar({
             <button
               key={step.id}
               onClick={() => onStepClick(step.id)}
-              className="relative group"
+              className="relative group shrink-0"
             >
               <motion.div
-                className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all"
                 style={{
                   borderColor: isCompleted || isActive ? color : 'rgba(75, 85, 99, 0.5)',
                   backgroundColor: isCompleted ? `${color}22` : isActive ? `${color}11` : 'transparent',
@@ -66,7 +66,7 @@ export default function ControlBar({
                 transition={isProcessing ? { repeat: Infinity, duration: 1 } : {}}
               >
                 {isProcessing ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
                 ) : (
                   i + 1
                 )}
@@ -88,13 +88,13 @@ export default function ControlBar({
       </div>
 
       {/* Divider */}
-      <div className="w-px h-8 bg-gray-700/50" />
+      <div className="w-px h-8 bg-gray-700/50 shrink-0" />
 
       {/* Action buttons */}
       <button
         onClick={onRun}
         disabled={!canRun || isRunning}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+        className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
           isRunning
             ? 'bg-primary-500/20 text-primary-400 cursor-wait'
             : canRun
@@ -105,12 +105,13 @@ export default function ControlBar({
         {isRunning ? (
           <>
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            Running...
+            <span className="hidden sm:inline">Running...</span>
           </>
         ) : (
           <>
             <Play className="w-3.5 h-3.5" />
-            Run Pipeline
+            <span className="hidden sm:inline">Run Pipeline</span>
+            <span className="sm:hidden">Run</span>
           </>
         )}
       </button>
@@ -118,7 +119,7 @@ export default function ControlBar({
       <button
         onClick={onReset}
         disabled={isRunning}
-        className="p-2 rounded-xl text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-all"
+        className="p-2 rounded-xl text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-all shrink-0"
         title="Reset"
       >
         <RotateCcw className="w-4 h-4" />
@@ -129,7 +130,7 @@ export default function ControlBar({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-lg text-[10px] text-red-400 max-w-[200px] truncate"
+          className="px-2 sm:px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-lg text-[10px] text-red-400 max-w-[120px] sm:max-w-[200px] truncate shrink-0"
         >
           {error}
         </motion.div>

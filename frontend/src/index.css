@@ -79,7 +79,7 @@
 
 @layer components {
   .step-card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-6 transition-all duration-300;
+    @apply bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-6 transition-all duration-300;
   }
 
   .step-card:hover {
@@ -138,5 +138,14 @@
 
   .badge-gray {
     @apply badge bg-gray-700 text-gray-300;
+  }
+
+  /* Hide scrollbar for horizontal scroll areas */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

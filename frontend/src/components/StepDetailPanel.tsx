@@ -46,7 +46,7 @@ export default function StepDetailPanel({
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 30 }}
         transition={{ duration: 0.3 }}
-        className="w-[420px] max-h-[calc(100vh-120px)] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col"
+        className="w-full sm:w-[420px] max-h-full sm:max-h-[calc(100vh-120px)] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-800 flex items-center justify-between shrink-0">
@@ -122,21 +122,19 @@ function InputContent({
     <>
       <div className="space-y-2">
         <label className="text-xs font-medium text-gray-400">Sample Documents</label>
-        <div className="grid grid-cols-1 gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {SAMPLE_DOCUMENTS.map((s) => (
             <button
               key={s.id}
               onClick={() => handleSample(s)}
-              className={`p-2 rounded-lg border text-left text-xs transition-all ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[11px] font-medium transition-all ${
                 documentText === s.text
                   ? 'border-primary-500 bg-primary-500/10 text-primary-300'
                   : 'border-gray-700/50 bg-gray-800/30 text-gray-400 hover:border-gray-600'
               }`}
             >
-              <div className="flex items-center gap-1.5">
-                <FileText className="w-3 h-3" />
-                <span className="font-medium text-gray-300">{s.title}</span>
-              </div>
+              <FileText className="w-3 h-3 shrink-0" />
+              {s.title}
             </button>
           ))}
         </div>

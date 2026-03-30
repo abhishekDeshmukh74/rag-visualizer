@@ -59,20 +59,20 @@ export default function App() {
       </div>
 
       {/* Title */}
-      <div className="absolute top-5 left-6 z-10">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/25">
-            <Zap className="w-4 h-4 text-white" />
+      <div className="absolute top-3 left-3 sm:top-5 sm:left-6 z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/25">
+            <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-gray-100 tracking-tight">RAG Visualizer</h1>
-            <p className="text-[10px] text-gray-500">Interactive 3D Pipeline</p>
+            <h1 className="text-xs sm:text-sm font-bold text-gray-100 tracking-tight">RAG Visualizer</h1>
+            <p className="text-[9px] sm:text-[10px] text-gray-500 hidden sm:block">Interactive 3D Pipeline</p>
           </div>
         </div>
       </div>
 
-      {/* Step detail panel — right side */}
-      <div className="absolute top-5 right-5 bottom-20 z-10 pointer-events-auto flex items-start">
+      {/* Step detail panel — right side, full overlay on mobile */}
+      <div className="absolute inset-3 sm:inset-auto sm:top-5 sm:right-5 sm:bottom-20 z-10 pointer-events-auto flex items-stretch sm:items-start">
         <AnimatePresence>
           {showPanel && (
             <StepDetailPanel
@@ -98,7 +98,7 @@ export default function App() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setShowPanel(true)}
-            className="absolute top-5 right-5 z-10 px-3 py-2 bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-xl text-xs text-gray-300 hover:text-white hover:border-gray-600 transition-all shadow-lg"
+            className="absolute top-3 right-3 sm:top-5 sm:right-5 z-10 px-3 py-2 bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-xl text-xs text-gray-300 hover:text-white hover:border-gray-600 transition-all shadow-lg"
           >
             Show Details
           </motion.button>
@@ -106,7 +106,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom control bar */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute bottom-3 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-5 z-10">
         <ControlBar
           isRunning={isRunning}
           processingStep={processingStep}

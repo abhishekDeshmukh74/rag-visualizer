@@ -70,7 +70,7 @@ export const PIPELINE_STEPS: StepInfo[] = [
 export const SAMPLE_DOCUMENTS: SampleDocument[] = [
   {
     id: 'redis',
-    title: 'Why Redis is Fast',
+    title: 'Redis info',
     description: 'A technical overview of Redis performance',
     text: `Redis is an open-source, in-memory data structure store used as a database, cache, message broker, and streaming engine. Redis provides data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes, and streams.
 
