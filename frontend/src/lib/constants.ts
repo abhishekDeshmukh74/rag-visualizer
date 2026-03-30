@@ -27,7 +27,7 @@ export const PIPELINE_STEPS: StepInfo[] = [
   },
   {
     id: 'query',
-    label: 'Query',
+    label: 'User Query',
     description: 'Enter a question and embed it',
     educationalText:
       'Your question is also converted into an embedding using the same model. This allows the system to compare your question against all chunks by measuring vector similarity.',
