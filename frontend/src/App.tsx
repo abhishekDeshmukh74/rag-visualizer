@@ -37,6 +37,9 @@ export default function App() {
 
   return (
     <div className="fixed inset-0 bg-gray-950 overflow-hidden">
+      {/* Stars background */}
+      <div className="stars-layer" />
+
       {/* Full-viewport 3D scene */}
       <div className="absolute inset-0">
         <PipelineScene
