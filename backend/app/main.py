@@ -74,11 +74,6 @@ async def lifespan(app: FastAPI):
         print("WARNING: GROQ_API_KEYS not set. The LLM answer step will fail.")
     key_manager = GroqKeyManager(keys) if keys else None
 
-    # Preload embedding model at startup so the first request is fast
-    print("Preloading embedding model...")
-    await asyncio.to_thread(preload_embedding_model)
-    print("Embedding model ready.")
-
     # Load precomputed sample-doc data
     _load_precomputed()
     if _precomputed_cache:
