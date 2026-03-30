@@ -1,4 +1,5 @@
 import type { PipelineConfig, PipelineResult } from './types';
+import { SAMPLE_DOCUMENTS } from './constants';
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL
   ? `${import.meta.env.VITE_BACKEND_URL}/api`
@@ -9,6 +10,9 @@ export async function runPipeline(
   query: string,
   config: PipelineConfig
 ): Promise<PipelineResult> {
+  // Check if the document matches a sample doc → send sample_id for fast path
+  const matchedSample = SAMPLE_DOCUMENTS.find((s) => s.text === documentText);
+
   const response = await fetch(`${API_BASE}/pipeline/run`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,6 +23,7 @@ export async function runPipeline(
       chunk_overlap: config.chunkOverlap,
       chunking_strategy: config.chunkingStrategy,
       top_k: config.topK,
+      ...(matchedSample ? { sample_id: matchedSample.id } : {}),
     }),
   });
 

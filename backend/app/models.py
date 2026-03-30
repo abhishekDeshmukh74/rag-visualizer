@@ -35,6 +35,7 @@ class PipelineRequest(BaseModel):
     chunk_overlap: int = Field(default=20, ge=0, le=100)
     chunking_strategy: str = Field(default="sentence", pattern="^(sentence|character)$")
     top_k: int = Field(default=3, ge=1, le=10)
+    sample_id: str | None = Field(default=None, max_length=50)
 
 
 class PipelineResponse(BaseModel):
