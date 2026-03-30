@@ -16,11 +16,12 @@ RAG Visualizer makes every stage of the RAG pipeline **visible and interactive**
 
 ## Tech Stack
 
-| Layer    | Technology                          |
-|----------|-------------------------------------|
-| Frontend | React, TypeScript, Vite, Tailwind CSS, Framer Motion, Recharts |
-| Backend  | Python, FastAPI, OpenAI API         |
-| Vectors  | In-memory (NumPy cosine similarity) |
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Frontend   | React, TypeScript, Vite, Tailwind CSS, Framer Motion, Recharts |
+| Backend    | Python, FastAPI, Groq API           |
+| Embeddings | sentence-transformers (`all-MiniLM-L6-v2`, local) |
+| Vectors    | In-memory (NumPy cosine similarity) |
 
 ## Quick Start
 
@@ -28,7 +29,7 @@ RAG Visualizer makes every stage of the RAG pipeline **visible and interactive**
 
 - Node.js 18+
 - Python 3.11+
-- OpenAI API key
+- Groq API key(s)
 
 ### 1. Clone & setup backend
 
@@ -45,17 +46,26 @@ pip install -r requirements.txt
 
 # Configure your API key
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+# Edit .env and add your GROQ_API_KEYS (comma-separated for rotation)
 ```
 
-### 2. Start the backend
+### 2. (Optional) Regenerate precomputed sample data
+
+Precomputed embeddings for the built-in sample documents are already included in `backend/precomputed/`. If you change the sample documents or default chunking config, regenerate them:
+
+```bash
+cd backend
+python precompute.py
+```
+
+### 3. Start the backend
 
 ```bash
 cd backend
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Setup & start the frontend
+### 4. Setup & start the frontend
 
 ```bash
 cd frontend
@@ -63,7 +73,7 @@ npm install
 npm run dev
 ```
 
-### 4. Open the app
+### 5. Open the app
 
 Visit **http://localhost:3000** in your browser.
 
@@ -87,10 +97,12 @@ rag-visualizer/
 │   │   └── lib/           # Types, API client, constants
 │   └── ...
 ├── backend/               # FastAPI backend
-│   └── app/
-│       ├── main.py        # API routes
-│       ├── pipeline.py    # RAG pipeline functions
-│       └── models.py      # Pydantic models
+│   ├── app/
+│   │   ├── main.py        # API routes
+│   │   ├── pipeline.py    # RAG pipeline functions
+│   │   └── models.py      # Pydantic models
+│   ├── precomputed/       # Pre-built embeddings for sample docs
+│   └── precompute.py      # Script to regenerate precomputed data
 └── README.md
 ```
 
@@ -100,14 +112,16 @@ The backend exposes a single `POST /api/pipeline/run` endpoint that:
 
 1. Parses the document and computes stats
 2. Chunks the document using the selected strategy
-3. Creates embeddings for all chunks (OpenAI `text-embedding-3-small`)
+3. Creates embeddings for all chunks (local `all-MiniLM-L6-v2`)
 4. Embeds the user's query
 5. Computes cosine similarity between query and all chunks
 6. Selects the top-k most relevant chunks
 7. Builds the augmented prompt with context
-8. Generates the final answer (OpenAI `gpt-4o-mini`)
+8. Generates the final answer (Groq `llama-3.1-8b-instant`)
 
 Every intermediate result is returned so the frontend can visualize each step.
+
+**Performance:** For the 3 built-in sample documents, steps 1-3 are precomputed at build time and loaded from `backend/precomputed/*.txt` on startup. Only the query embedding, similarity search, and LLM call run at request time, making sample-doc queries significantly faster. Custom documents still run the full pipeline.
 
 ## License
 
