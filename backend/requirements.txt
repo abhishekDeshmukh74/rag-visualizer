@@ -2,6 +2,7 @@ fastapi>=0.115.0
 uvicorn>=0.34.0
 groq>=1.0.0
 numpy>=2.0.0
+orjson>=3.10.0
 pydantic>=2.10.0
 python-dotenv>=1.0.0
 sentence-transformers>=3.0.0

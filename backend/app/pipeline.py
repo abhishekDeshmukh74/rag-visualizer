@@ -3,9 +3,13 @@
 import re
 import threading
 import numpy as np
+from numpy.typing import NDArray
 from groq import Groq, RateLimitError
 
 from .models import ChunkModel, ChunkEmbeddingModel, SimilarityResultModel, DocumentStatsModel
+
+# Max embedding dimensions to include in the API response (frontend only uses first ~80).
+_EMBED_TRUNCATE = 80
 
 
 class GroqKeyManager:
@@ -181,55 +185,71 @@ def create_embeddings(
 def create_all_embeddings(
     chunk_texts: list[str],
     query: str,
-) -> tuple[list[list[float]], list[float]]:
-    """Embed chunks and query in a single model.encode() call for efficiency."""
+) -> tuple[NDArray, NDArray]:
+    """Embed chunks and query in a single model.encode() call.
+
+    Returns raw numpy arrays so downstream code can use them directly
+    without list ↔ ndarray round-trips.
+    """
     model = get_embedding_model()
     all_texts = chunk_texts + [query]
     all_embeddings = model.encode(all_texts, normalize_embeddings=True, batch_size=64)
-    chunk_embeddings = [emb.tolist() for emb in all_embeddings[:-1]]
-    query_embedding = all_embeddings[-1].tolist()
-    return chunk_embeddings, query_embedding
+    return all_embeddings[:-1], all_embeddings[-1]
+
+
+def _truncate_embedding(emb: NDArray) -> list[float]:
+    """Truncate and round an embedding for the API response."""
+    return [round(float(v), 6) for v in emb[:_EMBED_TRUNCATE]]
+
+
+def build_chunk_embeddings(
+    chunks: list[ChunkModel],
+    raw_embeddings: NDArray,
+) -> list[ChunkEmbeddingModel]:
+    """Build response-ready ChunkEmbeddingModel list with truncated vectors."""
+    dims = int(raw_embeddings.shape[1])
+    return [
+        ChunkEmbeddingModel(
+            chunk_id=chunk.id,
+            embedding=_truncate_embedding(raw_embeddings[i]),
+            dimensions=dims,
+        )
+        for i, chunk in enumerate(chunks)
+    ]
 
 
 def compute_similarity(
-    query_embedding: list[float],
-    chunk_embeddings: list[ChunkEmbeddingModel],
+    query_vec: NDArray,
+    chunk_matrix: NDArray,
     chunks: list[ChunkModel],
 ) -> list[SimilarityResultModel]:
-    """Compute cosine similarity between query and all chunk embeddings (vectorized)."""
-    query_vec = np.array(query_embedding)
+    """Compute cosine similarity between query and all chunk embeddings (vectorized).
+
+    Operates directly on numpy arrays — no list conversion needed.
+    """
     query_norm = np.linalg.norm(query_vec)
 
-    if query_norm == 0 or not chunk_embeddings:
+    if query_norm == 0 or len(chunks) == 0:
         return [
-            SimilarityResultModel(chunk_id=emb.chunk_id, chunk=next(c for c in chunks if c.id == emb.chunk_id), score=0.0, rank=i + 1)
-            for i, emb in enumerate(chunk_embeddings)
+            SimilarityResultModel(chunk_id=c.id, chunk=c, score=0.0, rank=i + 1)
+            for i, c in enumerate(chunks)
         ]
 
-    # Vectorized: stack all chunk embeddings into a matrix and compute scores in one go
-    chunk_matrix = np.array([emb.embedding for emb in chunk_embeddings])
     chunk_norms = np.linalg.norm(chunk_matrix, axis=1)
-    # Avoid division by zero
     safe_norms = np.where(chunk_norms == 0, 1.0, chunk_norms)
     scores = chunk_matrix @ query_vec / (safe_norms * query_norm)
     scores = np.where(chunk_norms == 0, 0.0, scores)
 
-    # Build lookup for O(1) chunk access
-    chunk_map = {c.id: c for c in chunks}
-
-    # Sort by score descending
     ranked_indices = np.argsort(scores)[::-1]
-    results = [
+    return [
         SimilarityResultModel(
-            chunk_id=chunk_embeddings[idx].chunk_id,
-            chunk=chunk_map[chunk_embeddings[idx].chunk_id],
-            score=float(scores[idx]),
+            chunk_id=chunks[idx].id,
+            chunk=chunks[idx],
+            score=round(float(scores[idx]), 6),
             rank=rank + 1,
         )
         for rank, idx in enumerate(ranked_indices)
     ]
-
-    return results
 
 
 def retrieve_top_k(

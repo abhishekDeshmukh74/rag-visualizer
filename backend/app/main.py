@@ -10,6 +10,7 @@ from functools import partial
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 
 from .models import (
     PipelineRequest,
@@ -20,12 +21,14 @@ from .pipeline import (
     parse_document,
     chunk_document,
     create_all_embeddings,
+    build_chunk_embeddings,
     compute_similarity,
     retrieve_top_k,
     build_prompt,
     generate_answer,
     preload_embedding_model,
     GroqKeyManager,
+    _truncate_embedding,
 )
 
 load_dotenv()
@@ -56,6 +59,7 @@ app = FastAPI(
     description="Backend API for the RAG Visualizer — shows every step of the RAG pipeline.",
     version="1.0.0",
     lifespan=lifespan,
+    default_response_class=ORJSONResponse,
 )
 
 app.add_middleware(
@@ -101,23 +105,19 @@ async def run_pipeline(req: PipelineRequest):
 
         # Step 3 & 4: Embed chunks + query in a single batched call (off the event loop)
         chunk_texts = [c.text for c in chunks]
-        raw_embeddings, query_embedding = await asyncio.to_thread(
+        raw_chunk_embs, raw_query_emb = await asyncio.to_thread(
             create_all_embeddings, chunk_texts, req.query
         )
-        chunk_embeddings = [
-            ChunkEmbeddingModel(
-                chunk_id=chunk.id,
-                embedding=embedding,
-                dimensions=len(embedding),
-            )
-            for chunk, embedding in zip(chunks, raw_embeddings)
-        ]
+
+        # Build truncated embeddings for the response (much smaller JSON)
+        chunk_embeddings = build_chunk_embeddings(chunks, raw_chunk_embs)
+        query_embedding = _truncate_embedding(raw_query_emb)
 
         t2 = time.perf_counter()
 
-        # Step 5: Compute similarity (vectorized, off the event loop)
+        # Step 5: Compute similarity using raw numpy arrays (no list round-trip)
         similarity_results = await asyncio.to_thread(
-            compute_similarity, query_embedding, chunk_embeddings, chunks
+            compute_similarity, raw_query_emb, raw_chunk_embs, chunks
         )
 
         # Step 6: Retrieve top-k

@@ -330,7 +330,7 @@ function QueryContent({ query, result }: { query: string; result: PipelineResult
         <p className="text-sm text-gray-200 mt-0.5">{query}</p>
       </div>
       <div className="text-xs text-gray-400">
-        Embedded to <span className="text-amber-300 font-medium">{result.queryEmbedding.length}D</span> vector
+        Embedded to <span className="text-amber-300 font-medium">{result.chunkEmbeddings[0]?.dimensions ?? result.queryEmbedding.length}D</span> vector
       </div>
       <div className="flex gap-px h-6 rounded overflow-hidden">
         {result.queryEmbedding.slice(0, 60).map((val, i) => (

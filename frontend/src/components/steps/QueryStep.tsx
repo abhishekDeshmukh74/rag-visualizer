@@ -6,9 +6,10 @@ interface QueryStepProps {
   query: string;
   onQueryChange: (query: string) => void;
   queryEmbedding: number[] | null;
+  embeddingDimensions?: number;
 }
 
-export default function QueryStep({ query, onQueryChange, queryEmbedding }: QueryStepProps) {
+export default function QueryStep({ query, onQueryChange, queryEmbedding, embeddingDimensions }: QueryStepProps) {
   const step = PIPELINE_STEPS[3];
 
   return (
@@ -34,7 +35,7 @@ export default function QueryStep({ query, onQueryChange, queryEmbedding }: Quer
           <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
             <div className="text-sm text-gray-400 mb-2">
               Query converted to a{' '}
-              <span className="text-primary-300 font-medium">{queryEmbedding.length}-dimensional</span>{' '}
+              <span className="text-primary-300 font-medium">{embeddingDimensions ?? queryEmbedding.length}-dimensional</span>{' '}
               embedding vector
             </div>
             <div className="flex gap-px h-8 rounded overflow-hidden">
@@ -51,7 +52,7 @@ export default function QueryStep({ query, onQueryChange, queryEmbedding }: Quer
               ))}
             </div>
             <div className="text-[10px] text-gray-600 mt-1">
-              First 80 of {queryEmbedding.length} dimensions
+              First 80 of {embeddingDimensions ?? queryEmbedding.length} dimensions
             </div>
           </div>
         )}
