@@ -4,7 +4,6 @@ import re
 import threading
 import numpy as np
 from groq import Groq, RateLimitError
-from sentence_transformers import SentenceTransformer
 
 from .models import ChunkModel, ChunkEmbeddingModel, SimilarityResultModel, DocumentStatsModel
 
@@ -39,14 +38,15 @@ class GroqKeyManager:
             self._index = (self._index + 1) % len(self._keys)
 
 
-# Load embedding model once at module level
-_embedding_model: SentenceTransformer | None = None
+# Load embedding model once (lazy to avoid slow startup)
+_embedding_model = None
 
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model():
     """Lazy-load the sentence-transformer model."""
     global _embedding_model
     if _embedding_model is None:
+        from sentence_transformers import SentenceTransformer
         _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
     return _embedding_model
 
