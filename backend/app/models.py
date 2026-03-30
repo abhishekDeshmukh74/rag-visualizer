@@ -32,7 +32,7 @@ class PipelineRequest(BaseModel):
     document_text: str = Field(..., min_length=1, max_length=50000)
     query: str = Field(..., min_length=1, max_length=1000)
     chunk_size: int = Field(default=200, ge=50, le=500)
-    chunk_overlap: int = Field(default=50, ge=0, le=100)
+    chunk_overlap: int = Field(default=20, ge=0, le=100)
     chunking_strategy: str = Field(default="sentence", pattern="^(sentence|character)$")
     top_k: int = Field(default=3, ge=1, le=10)
 

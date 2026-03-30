@@ -56,26 +56,28 @@ interface PipelineSceneProps {
 
 // Arrange steps in a curved arc
 const STEP_POSITIONS: Record<PipelineStep, [number, number, number]> = {
-  input:     [-4.5, 1.2,  0],
-  chunking:  [-3.0, 0.2,  0.8],
-  embedding: [-1.2, -0.5, 1.2],
-  query:     [ 0.3,  -0.8,  0.8],
-  retrieval: [ 1.8, -0.5, 0.4],
-  prompt:    [ 3.3, 0.2,  -0.2],
-  answer:    [ 4.5, 1.2,  -0.4],
+  input:     [-5.5, 1.4,  0],
+  chunking:  [-3.8, 0.4,  0.8],
+  embedding: [-2.0, -0.4, 1.2],
+  vectordb:  [-0.4, -0.8, 1.2],
+  query:     [ 1.2, -0.8,  0.8],
+  retrieval: [ 2.8, -0.4, 0.4],
+  prompt:    [ 4.2, 0.4,  -0.2],
+  answer:    [ 5.5, 1.4,  -0.4],
 };
 
 const STEP_COLORS: Record<PipelineStep, string> = {
   input:     '#818cf8',
   chunking:  '#6366f1',
   embedding: '#8b5cf6',
+  vectordb:  '#a78bfa',
   query:     '#f59e0b',
   retrieval: '#3b82f6',
   prompt:    '#06b6d4',
   answer:    '#10b981',
 };
 
-const STEP_ORDER: PipelineStep[] = ['input', 'chunking', 'embedding', 'query', 'retrieval', 'prompt', 'answer'];
+const STEP_ORDER: PipelineStep[] = ['input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer'];
 
 export default function PipelineScene({
   currentStep,

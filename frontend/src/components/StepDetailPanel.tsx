@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles,
-  X, ChevronRight, Copy, Check, Eye, EyeOff, BookOpen,
+  X, ChevronRight, Copy, Check, Eye, EyeOff, BookOpen, Database,
 } from 'lucide-react';
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -9,7 +9,7 @@ import type { PipelineStep, PipelineResult, PipelineConfig, SampleDocument } fro
 import { PIPELINE_STEPS, SAMPLE_DOCUMENTS } from '../lib/constants';
 
 const stepIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles,
+  FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles, Database,
 };
 
 interface StepDetailPanelProps {
@@ -87,6 +87,7 @@ export default function StepDetailPanel({
             <ChunkingContent result={result} config={config} onConfigChange={onConfigChange} />
           )}
           {currentStep === 'embedding' && <EmbeddingContent result={result} />}
+          {currentStep === 'vectordb' && <VectorDBContent result={result} />}
           {currentStep === 'query' && <QueryContent query={query} result={result} />}
           {currentStep === 'retrieval' && (
             <RetrievalContent result={result} config={config} onConfigChange={onConfigChange} />
@@ -267,6 +268,53 @@ function EmbeddingContent({ result }: { result: PipelineResult | null }) {
             )}
           </div>
         ))}
+      </div>
+    </>
+  );
+}
+
+function VectorDBContent({ result }: { result: PipelineResult | null }) {
+  if (!result) return <EmptyState />;
+
+  const totalVectors = result.chunkEmbeddings.length;
+  const dims = result.chunkEmbeddings[0]?.dimensions || 0;
+
+  return (
+    <>
+      <p className="text-xs text-gray-400 leading-relaxed">
+        A vector database is a specialized storage system designed for embedding vectors. Unlike traditional databases that match on exact values, a vector DB indexes high-dimensional vectors so that nearest-neighbor queries run in sub-linear time — even across millions of records. This is what makes retrieval fast and scalable in production RAG systems.
+      </p>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/30 text-center">
+          <span className="text-lg font-bold text-purple-400">{totalVectors}</span>
+          <p className="text-[10px] text-gray-500 mt-0.5">Vectors Stored</p>
+        </div>
+        <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/30 text-center">
+          <span className="text-lg font-bold text-purple-400">{dims}D</span>
+          <p className="text-[10px] text-gray-500 mt-0.5">Dimensions</p>
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <span className="text-[10px] text-gray-500 uppercase tracking-wider">Indexed Chunks</span>
+        <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1">
+          {result.chunkEmbeddings.map((emb) => (
+            <div key={emb.chunkId} className="p-2 bg-gray-800/20 border border-gray-700/30 rounded-lg flex items-center gap-2">
+              <Database className="w-3 h-3 text-purple-400 shrink-0" />
+              <span className="text-[10px] text-purple-400 font-medium shrink-0">#{emb.chunkId + 1}</span>
+              <div className="flex gap-px h-3 rounded overflow-hidden flex-1">
+                {emb.embedding.slice(0, 30).map((val, j) => (
+                  <div key={j} className="flex-1" style={{
+                    backgroundColor: val > 0
+                      ? `rgba(167, 139, 250, ${Math.min(Math.abs(val) * 5, 1)})`
+                      : `rgba(251, 146, 60, ${Math.min(Math.abs(val) * 5, 1)})`,
+                  }} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

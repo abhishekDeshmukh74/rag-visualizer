@@ -1,7 +1,11 @@
 """FastAPI application — RAG Visualizer backend."""
 
+import asyncio
+import logging
 import os
+import time
 from contextlib import asynccontextmanager
+from functools import partial
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -15,11 +19,12 @@ from .models import (
 from .pipeline import (
     parse_document,
     chunk_document,
-    create_embeddings,
+    create_all_embeddings,
     compute_similarity,
     retrieve_top_k,
     build_prompt,
     generate_answer,
+    preload_embedding_model,
     GroqKeyManager,
 )
 
@@ -36,6 +41,12 @@ async def lifespan(app: FastAPI):
     if not keys:
         print("WARNING: GROQ_API_KEYS not set. The LLM answer step will fail.")
     key_manager = GroqKeyManager(keys) if keys else None
+
+    # Preload embedding model at startup so the first request is fast
+    print("Preloading embedding model...")
+    await asyncio.to_thread(preload_embedding_model)
+    print("Embedding model ready.")
+
     yield
     key_manager = None
 
@@ -70,6 +81,8 @@ async def run_pipeline(req: PipelineRequest):
         )
 
     try:
+        t0 = time.perf_counter()
+
         # Step 1: Parse document
         document_stats = parse_document(req.document_text)
 
@@ -84,9 +97,13 @@ async def run_pipeline(req: PipelineRequest):
         if not chunks:
             raise HTTPException(status_code=400, detail="No chunks generated from the document.")
 
-        # Step 3: Create embeddings for chunks (local model, no API needed)
+        t1 = time.perf_counter()
+
+        # Step 3 & 4: Embed chunks + query in a single batched call (off the event loop)
         chunk_texts = [c.text for c in chunks]
-        raw_embeddings = create_embeddings(chunk_texts)
+        raw_embeddings, query_embedding = await asyncio.to_thread(
+            create_all_embeddings, chunk_texts, req.query
+        )
         chunk_embeddings = [
             ChunkEmbeddingModel(
                 chunk_id=chunk.id,
@@ -96,12 +113,12 @@ async def run_pipeline(req: PipelineRequest):
             for chunk, embedding in zip(chunks, raw_embeddings)
         ]
 
-        # Step 4: Embed the query (local model)
-        query_embeddings = create_embeddings([req.query])
-        query_embedding = query_embeddings[0]
+        t2 = time.perf_counter()
 
-        # Step 5: Compute similarity
-        similarity_results = compute_similarity(query_embedding, chunk_embeddings, chunks)
+        # Step 5: Compute similarity (vectorized, off the event loop)
+        similarity_results = await asyncio.to_thread(
+            compute_similarity, query_embedding, chunk_embeddings, chunks
+        )
 
         # Step 6: Retrieve top-k
         top_chunks = retrieve_top_k(similarity_results, req.top_k)
@@ -109,8 +126,16 @@ async def run_pipeline(req: PipelineRequest):
         # Step 7: Build prompt
         prompt = build_prompt(req.query, top_chunks)
 
-        # Step 8: Generate answer via Groq
-        answer = generate_answer(key_manager, prompt)
+        t3 = time.perf_counter()
+
+        # Step 8: Generate answer via Groq (off the event loop)
+        answer = await asyncio.to_thread(generate_answer, key_manager, prompt)
+
+        t4 = time.perf_counter()
+        logging.info(
+            "Pipeline timing: chunk=%.2fs  embed=%.2fs  retrieve=%.2fs  llm=%.2fs  total=%.2fs",
+            t1 - t0, t2 - t1, t3 - t2, t4 - t3, t4 - t0,
+        )
 
         return PipelineResponse(
             document_stats=document_stats,

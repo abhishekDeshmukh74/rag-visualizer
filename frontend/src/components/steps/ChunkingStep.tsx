@@ -84,6 +84,11 @@ export default function ChunkingStep({
           </div>
         </div>
 
+        {/* Overlap explanation */}
+        <p className="text-sm text-gray-400 leading-relaxed">
+          Overlap ensures that context is not lost at chunk boundaries. When chunks share a few overlapping characters or sentences, important information that spans two chunks is preserved in both, improving retrieval accuracy and preventing the model from missing relevant context.
+        </p>
+
         {/* Chunks display */}
         <div className="flex items-center gap-2 mb-2">
           <Layers className="w-4 h-4 text-primary-400" />

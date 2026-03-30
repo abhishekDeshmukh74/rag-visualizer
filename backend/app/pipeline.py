@@ -51,6 +51,11 @@ def get_embedding_model():
     return _embedding_model
 
 
+def preload_embedding_model() -> None:
+    """Eagerly load the model so the first request is fast."""
+    get_embedding_model()
+
+
 def parse_document(text: str) -> DocumentStatsModel:
     """Compute document statistics."""
     sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', text) if s.strip()]
@@ -66,7 +71,7 @@ def parse_document(text: str) -> DocumentStatsModel:
 def chunk_document(
     text: str,
     chunk_size: int = 200,
-    chunk_overlap: int = 50,
+    chunk_overlap: int = 20,
     strategy: str = "sentence",
 ) -> list[ChunkModel]:
     """Split document into chunks using the specified strategy."""
@@ -169,8 +174,21 @@ def create_embeddings(
 ) -> list[list[float]]:
     """Create embeddings for a list of texts using a local sentence-transformer model."""
     model = get_embedding_model()
-    embeddings = model.encode(texts, normalize_embeddings=True)
+    embeddings = model.encode(texts, normalize_embeddings=True, batch_size=64)
     return [emb.tolist() for emb in embeddings]
+
+
+def create_all_embeddings(
+    chunk_texts: list[str],
+    query: str,
+) -> tuple[list[list[float]], list[float]]:
+    """Embed chunks and query in a single model.encode() call for efficiency."""
+    model = get_embedding_model()
+    all_texts = chunk_texts + [query]
+    all_embeddings = model.encode(all_texts, normalize_embeddings=True, batch_size=64)
+    chunk_embeddings = [emb.tolist() for emb in all_embeddings[:-1]]
+    query_embedding = all_embeddings[-1].tolist()
+    return chunk_embeddings, query_embedding
 
 
 def compute_similarity(
@@ -178,32 +196,38 @@ def compute_similarity(
     chunk_embeddings: list[ChunkEmbeddingModel],
     chunks: list[ChunkModel],
 ) -> list[SimilarityResultModel]:
-    """Compute cosine similarity between query and all chunk embeddings."""
+    """Compute cosine similarity between query and all chunk embeddings (vectorized)."""
     query_vec = np.array(query_embedding)
     query_norm = np.linalg.norm(query_vec)
 
-    results: list[SimilarityResultModel] = []
-    for emb in chunk_embeddings:
-        chunk_vec = np.array(emb.embedding)
-        chunk_norm = np.linalg.norm(chunk_vec)
+    if query_norm == 0 or not chunk_embeddings:
+        return [
+            SimilarityResultModel(chunk_id=emb.chunk_id, chunk=next(c for c in chunks if c.id == emb.chunk_id), score=0.0, rank=i + 1)
+            for i, emb in enumerate(chunk_embeddings)
+        ]
 
-        if query_norm == 0 or chunk_norm == 0:
-            score = 0.0
-        else:
-            score = float(np.dot(query_vec, chunk_vec) / (query_norm * chunk_norm))
+    # Vectorized: stack all chunk embeddings into a matrix and compute scores in one go
+    chunk_matrix = np.array([emb.embedding for emb in chunk_embeddings])
+    chunk_norms = np.linalg.norm(chunk_matrix, axis=1)
+    # Avoid division by zero
+    safe_norms = np.where(chunk_norms == 0, 1.0, chunk_norms)
+    scores = chunk_matrix @ query_vec / (safe_norms * query_norm)
+    scores = np.where(chunk_norms == 0, 0.0, scores)
 
-        chunk = next(c for c in chunks if c.id == emb.chunk_id)
-        results.append(SimilarityResultModel(
-            chunk_id=emb.chunk_id,
-            chunk=chunk,
-            score=score,
-            rank=0,
-        ))
+    # Build lookup for O(1) chunk access
+    chunk_map = {c.id: c for c in chunks}
 
-    # Sort by score descending and assign ranks
-    results.sort(key=lambda r: r.score, reverse=True)
-    for i, result in enumerate(results):
-        result.rank = i + 1
+    # Sort by score descending
+    ranked_indices = np.argsort(scores)[::-1]
+    results = [
+        SimilarityResultModel(
+            chunk_id=chunk_embeddings[idx].chunk_id,
+            chunk=chunk_map[chunk_embeddings[idx].chunk_id],
+            score=float(scores[idx]),
+            rank=rank + 1,
+        )
+        for rank, idx in enumerate(ranked_indices)
+    ]
 
     return results
 
@@ -237,7 +261,7 @@ QUESTION:
 {query}"""
 
 
-def generate_answer(key_manager: GroqKeyManager, prompt: str, model: str = "llama-3.3-70b-versatile") -> str:
+def generate_answer(key_manager: GroqKeyManager, prompt: str, model: str = "llama-3.1-8b-instant") -> str:
     """Generate an answer using Groq, rotating API keys on rate limit errors."""
     last_error = None
     for _ in range(key_manager.total_keys):
@@ -250,7 +274,7 @@ def generate_answer(key_manager: GroqKeyManager, prompt: str, model: str = "llam
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
-                max_tokens=1000,
+                max_tokens=500,
             )
             return response.choices[0].message.content or "No response generated."
         except RateLimitError as e:

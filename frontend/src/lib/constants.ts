@@ -26,6 +26,14 @@ export const PIPELINE_STEPS: StepInfo[] = [
     icon: 'Binary',
   },
   {
+    id: 'vectordb',
+    label: 'Vector DB',
+    description: 'Store embeddings in a vector database',
+    educationalText:
+      'A vector database stores embeddings and enables fast similarity search at scale. Instead of comparing against every vector, it uses indexing structures (like HNSW or IVF) to find nearest neighbors efficiently — making retrieval practical even with millions of chunks.',
+    icon: 'Database',
+  },
+  {
     id: 'query',
     label: 'User Query',
     description: 'Enter a question and embed it',
@@ -148,9 +156,9 @@ The bias-variance tradeoff is a fundamental concept in machine learning. Bias re
 
 export const DEFAULT_CONFIG = {
   chunkSize: 200,
-  chunkOverlap: 50,
+  chunkOverlap: 20,
   chunkingStrategy: 'sentence' as const,
   topK: 3,
   embeddingModel: 'all-MiniLM-L6-v2',
-  llmModel: 'llama-3.3-70b-versatile',
+  llmModel: 'llama-3.1-8b-instant',
 };

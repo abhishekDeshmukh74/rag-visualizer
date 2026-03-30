@@ -4,13 +4,14 @@ import { runPipeline } from '../lib/api';
 import { DEFAULT_CONFIG } from '../lib/constants';
 
 const STEP_ORDER: PipelineStep[] = [
-  'input', 'chunking', 'embedding', 'query', 'retrieval', 'prompt', 'answer',
+  'input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer',
 ];
 
 const STEP_DELAY_MS: Record<PipelineStep, number> = {
   input: 0,
   chunking: 600,
   embedding: 800,
+  vectordb: 600,
   query: 500,
   retrieval: 700,
   prompt: 500,

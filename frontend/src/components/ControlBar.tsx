@@ -9,6 +9,7 @@ const STEP_COLORS: Record<string, string> = {
   input: '#5c7cfa',
   chunking: '#be4bdb',
   embedding: '#20c997',
+  vectordb: '#a78bfa',
   query: '#fcc419',
   retrieval: '#ff6b6b',
   prompt: '#ff922b',

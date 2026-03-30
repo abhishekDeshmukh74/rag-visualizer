@@ -49,6 +49,7 @@ export type PipelineStep =
   | 'input'
   | 'chunking'
   | 'embedding'
+  | 'vectordb'
   | 'query'
   | 'retrieval'
   | 'prompt'
