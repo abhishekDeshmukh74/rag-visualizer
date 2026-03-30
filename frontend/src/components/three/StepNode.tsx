@@ -175,6 +175,7 @@ export default function StepNode({
           opacity={isActive ? 1 : 0.85}
         />
       </sprite>
+
     </group>
   );
 }

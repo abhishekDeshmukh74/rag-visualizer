@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles,
-  X, ChevronRight, Copy, Check, Eye, EyeOff, BookOpen, Database,
+  X, ChevronRight, Copy, Check, Eye, EyeOff, BookOpen, Database, Info,
 } from 'lucide-react';
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -57,19 +57,22 @@ export default function StepDetailPanel({
               <p className="text-xs text-gray-500">{stepInfo.description}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-gray-300 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Educational tip */}
+        {/* Educational tip with info icon for deep dive */}
         <div className="px-4 pt-3 shrink-0">
-          <div className="p-2.5 bg-primary-500/5 border border-primary-500/20 rounded-lg">
-            <p className="text-[11px] text-primary-200/70 leading-relaxed">{stepInfo.educationalText}</p>
-          </div>
+          <EducationalTip
+            educationalText={stepInfo.educationalText}
+            deepDiveText={stepInfo.deepDiveText}
+          />
         </div>
 
         {/* Content */}
@@ -97,6 +100,47 @@ export default function StepDetailPanel({
         </div>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+/* ---- Educational tip with deep dive toggle ---- */
+
+function EducationalTip({ educationalText, deepDiveText }: { educationalText: string; deepDiveText: string }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="p-2.5 bg-primary-500/5 border border-primary-500/20 rounded-lg">
+      <div className="flex items-start gap-2">
+        <BookOpen className="w-3.5 h-3.5 text-primary-400 mt-0.5 shrink-0" />
+        <p className="text-[11px] text-primary-200/70 leading-relaxed flex-1">{educationalText}</p>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className={`p-1 rounded-md transition-colors shrink-0 ${
+            expanded
+              ? 'bg-primary-500/15 text-primary-400'
+              : 'text-primary-400/50 hover:text-primary-400 hover:bg-primary-500/10'
+          }`}
+          title="Deep dive"
+        >
+          <Info className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 pt-2 border-t border-primary-500/10">
+              <p className="text-[11px] text-primary-200/60 leading-relaxed">{deepDiveText}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 

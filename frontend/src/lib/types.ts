@@ -60,6 +60,7 @@ export interface StepInfo {
   label: string;
   description: string;
   educationalText: string;
+  deepDiveText: string;
   icon: string;
 }
 

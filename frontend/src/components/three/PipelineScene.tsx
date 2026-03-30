@@ -27,10 +27,11 @@ function CameraControls({
     controls.enablePan = false;
     controls.enableZoom = true;
     controls.minDistance = 4;
-    controls.maxDistance = 12;
-    controls.maxPolarAngle = Math.PI * 0.7;
-    controls.minPolarAngle = Math.PI * 0.3;
+    controls.maxDistance = 20;
+    controls.maxPolarAngle = Math.PI * 0.75;
+    controls.minPolarAngle = Math.PI * 0.2;
     controls.enableDamping = true;
+    controls.target.set(0, -0.4, 0);
     controlsRef.current = controls;
     return () => controls.dispose();
   }, [camera, gl]);
@@ -54,16 +55,16 @@ interface PipelineSceneProps {
   onStepClick: (step: PipelineStep) => void;
 }
 
-// Arrange steps in a curved arc
+// Arrange steps diagonally: bottom-left to top-right
 const STEP_POSITIONS: Record<PipelineStep, [number, number, number]> = {
-  input:     [-5.5, 1.4,  0],
-  chunking:  [-3.8, 0.4,  0.8],
-  embedding: [-2.0, -0.4, 1.2],
-  vectordb:  [-0.4, -0.8, 1.2],
-  query:     [ 1.2, -0.8,  0.8],
-  retrieval: [ 2.8, -0.4, 0.4],
-  prompt:    [ 4.2, 0.4,  -0.2],
-  answer:    [ 5.5, 1.4,  -0.4],
+  input:     [-4.5, -3.2, 0],
+  chunking:  [-3.2, -2.4, 0],
+  embedding: [-2.0, -1.6, 0],
+  vectordb:  [-0.8, -0.8, 0],
+  query:     [ 0.4,  0.0, 0],
+  retrieval: [ 1.6,  0.8, 0],
+  prompt:    [ 2.8,  1.6, 0],
+  answer:    [ 4.0,  2.4, 0],
 };
 
 const STEP_COLORS: Record<PipelineStep, string> = {
@@ -90,7 +91,7 @@ export default function PipelineScene({
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 2, 7], fov: 50 }}
+        camera={{ position: [0, 0, 9], fov: 50 }}
         style={{ background: 'transparent' }}
         gl={{ alpha: true, antialias: true }}
       >
@@ -99,10 +100,10 @@ export default function PipelineScene({
       <directionalLight position={[5, 5, 5]} intensity={0.5} />
       <directionalLight position={[-5, 3, -5]} intensity={0.3} color="#818cf8" />
 
-      {/* Controls */}
+      {/* Controls — no auto-rotate */}
       <CameraControls
-        autoRotate={!isRunning && !result}
-        autoRotateSpeed={0.3}
+        autoRotate={false}
+        autoRotateSpeed={0}
       />
 
       {/* Background particles */}
@@ -147,7 +148,7 @@ export default function PipelineScene({
 
       {/* Chunk cloud visualization - visible during retrieval */}
       {result && (
-        <group position={[0, 1.5, -1]}>
+        <group position={[0, 2.5, -1]}>
           <ChunkCloud
             similarityResults={result.similarityResults}
             visible={currentStep === 'retrieval' || currentStep === 'embedding'}

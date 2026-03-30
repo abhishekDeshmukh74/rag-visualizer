@@ -20,7 +20,7 @@ export default function DataFlow({ from, to, isActive, isCompleted, color }: Dat
     const mid: [number, number, number] = [
       (from[0] + to[0]) / 2,
       (from[1] + to[1]) / 2 + 0.3,
-      (from[2] + to[2]) / 2 + 0.15,
+      (from[2] + to[2]) / 2,
     ];
     const c = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(...from),

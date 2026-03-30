@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePipeline } from './hooks/usePipeline';
 import PipelineScene from './components/three/PipelineScene';
 import StepDetailPanel from './components/StepDetailPanel';
 import ControlBar from './components/ControlBar';
 import type { PipelineStep } from './lib/types';
+import { PIPELINE_STEPS } from './lib/constants';
 import { Zap } from 'lucide-react';
 
 export default function App() {
@@ -28,6 +29,48 @@ export default function App() {
 
   const [showPanel, setShowPanel] = useState(true);
 
+  // Swipe gesture for mobile step navigation
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const STEP_IDS = PIPELINE_STEPS.map((s) => s.id) as PipelineStep[];
+
+  const goToNextStep = useCallback(() => {
+    const idx = STEP_IDS.indexOf(currentStep);
+    if (idx < STEP_IDS.length - 1) {
+      const next = STEP_IDS[idx + 1];
+      setCurrentStep(next);
+      setShowPanel(true);
+    }
+  }, [currentStep, setCurrentStep]);
+
+  const goToPrevStep = useCallback(() => {
+    const idx = STEP_IDS.indexOf(currentStep);
+    if (idx > 0) {
+      const prev = STEP_IDS[idx - 1];
+      setCurrentStep(prev);
+      setShowPanel(true);
+    }
+  }, [currentStep, setCurrentStep]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    // Only trigger if horizontal swipe is dominant and exceeds threshold
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) goToNextStep();
+      else goToPrevStep();
+    }
+  }, [goToNextStep, goToPrevStep]);
+
   const handleStepClick = (step: PipelineStep) => {
     setCurrentStep(step);
     setShowPanel(true);
@@ -36,7 +79,11 @@ export default function App() {
   const canRun = !!(documentText.trim() && query.trim());
 
   return (
-    <div className="fixed inset-0 bg-gray-950 overflow-hidden">
+    <div
+      className="fixed inset-0 bg-gray-950 overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Stars background */}
       <div className="stars-layer" />
 
@@ -105,8 +152,8 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Bottom control bar */}
-      <div className="absolute bottom-3 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:bottom-5 z-10">
+      {/* Control bar — vertical left on desktop, horizontal bottom on mobile */}
+      <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 z-10">
         <ControlBar
           isRunning={isRunning}
           processingStep={processingStep}
