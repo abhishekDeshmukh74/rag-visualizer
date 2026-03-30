@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePipeline } from './hooks/usePipeline';
 import PipelineScene from './components/three/PipelineScene';
@@ -51,6 +51,16 @@ export default function App() {
       setShowPanel(true);
     }
   }, [currentStep, setCurrentStep]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') goToNextStep();
+      else if (e.key === 'ArrowLeft') goToPrevStep();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [goToNextStep, goToPrevStep]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
