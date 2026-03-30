@@ -47,11 +47,11 @@ _embedding_model = None
 
 
 def get_embedding_model():
-    """Lazy-load the sentence-transformer model."""
+    """Lazy-load the fastembed model."""
     global _embedding_model
     if _embedding_model is None:
-        from sentence_transformers import SentenceTransformer
-        _embedding_model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+        from fastembed import TextEmbedding
+        _embedding_model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
     return _embedding_model
 
 
@@ -176,9 +176,9 @@ def _chunk_by_character(text: str, chunk_size: int, chunk_overlap: int) -> list[
 def create_embeddings(
     texts: list[str],
 ) -> list[list[float]]:
-    """Create embeddings for a list of texts using a local sentence-transformer model."""
+    """Create embeddings for a list of texts using fastembed."""
     model = get_embedding_model()
-    embeddings = model.encode(texts, normalize_embeddings=True, batch_size=64)
+    embeddings = list(model.embed(texts))
     return [emb.tolist() for emb in embeddings]
 
 
@@ -186,14 +186,14 @@ def create_all_embeddings(
     chunk_texts: list[str],
     query: str,
 ) -> tuple[NDArray, NDArray]:
-    """Embed chunks and query in a single model.encode() call.
+    """Embed chunks and query in a single call.
 
     Returns raw numpy arrays so downstream code can use them directly
     without list ↔ ndarray round-trips.
     """
     model = get_embedding_model()
     all_texts = chunk_texts + [query]
-    all_embeddings = model.encode(all_texts, normalize_embeddings=True, batch_size=64)
+    all_embeddings = np.array(list(model.embed(all_texts)), dtype=np.float32)
     return all_embeddings[:-1], all_embeddings[-1]
 
 

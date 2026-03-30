@@ -138,7 +138,7 @@ async def run_pipeline(req: PipelineRequest):
             # Only embed the user query
             model = get_embedding_model()
             raw_query_emb = await asyncio.to_thread(
-                lambda: model.encode(req.query, normalize_embeddings=True)
+                lambda: np.array(list(model.embed([req.query]))[0], dtype=np.float32)
             )
             query_embedding = _truncate_embedding(raw_query_emb)
 
