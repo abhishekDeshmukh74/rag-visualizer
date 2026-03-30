@@ -14,7 +14,6 @@ import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
 
 from .models import (
     PipelineRequest,
@@ -74,6 +73,11 @@ async def lifespan(app: FastAPI):
         print("WARNING: GROQ_API_KEYS not set. The LLM answer step will fail.")
     key_manager = GroqKeyManager(keys) if keys else None
 
+    # Preload embedding model so the first request is fast
+    print("Preloading embedding model...")
+    await asyncio.to_thread(preload_embedding_model)
+    print("Embedding model ready.")
+
     # Load precomputed sample-doc data
     _load_precomputed()
     if _precomputed_cache:
@@ -88,7 +92,6 @@ app = FastAPI(
     description="Backend API for the RAG Visualizer — shows every step of the RAG pipeline.",
     version="1.0.0",
     lifespan=lifespan,
-    default_response_class=ORJSONResponse,
 )
 
 app.add_middleware(
