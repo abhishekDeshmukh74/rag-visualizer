@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import {
   Play, RotateCcw, Loader2,
   FileText, Scissors, Binary, Database, Search, Filter, MessageSquare, Sparkles,
@@ -44,6 +45,20 @@ export default function ControlBar({
   onReset,
   onStepClick,
 }: ControlBarProps) {
+  const showHighlight = canRun && !isRunning && completedSteps.length <= 1;
+  const [dismissed, setDismissed] = useState(false);
+  const highlight = showHighlight && !dismissed;
+
+  // Reset dismissed state when canRun becomes false (user cleared inputs)
+  useEffect(() => {
+    if (!canRun) setDismissed(false);
+  }, [canRun]);
+
+  const handleRun = () => {
+    setDismissed(true);
+    onRun();
+  };
+
   return (
     <div className="flex flex-row sm:flex-col items-center gap-2 sm:gap-3 bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/40 px-3 py-2.5 sm:px-2.5 sm:py-4 w-full sm:w-auto">
       {/* Pipeline step indicators — horizontal scrollable on mobile, vertical on desktop */}
@@ -108,10 +123,28 @@ export default function ControlBar({
 
       {/* Action buttons */}
       <div className="relative group shrink-0">
+        {/* Spotlight highlight overlay */}
+        <AnimatePresence>
+          {highlight && (
+            <>
+              {/* Pulsing ring */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute inset-0 -m-1.5 rounded-2xl pointer-events-none z-0"
+              >
+                <div className="absolute inset-0 rounded-2xl border-2 border-primary-400 animate-ping opacity-40" />
+                <div className="absolute inset-0 rounded-2xl border-2 border-primary-400 opacity-70" />
+                <div className="absolute inset-0 rounded-2xl bg-primary-500/10" />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
         <button
-          onClick={onRun}
+          onClick={handleRun}
           disabled={!canRun || isRunning}
-          className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-xs font-semibold transition-all ${
+          className={`relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-xs font-semibold transition-all ${
             isRunning
               ? 'bg-primary-500/20 text-primary-400 cursor-wait'
               : canRun
@@ -124,10 +157,28 @@ export default function ControlBar({
           ) : (
             <Play className="w-4 h-4" />
           )}
+          {/* Tooltip arrow + label — positioned relative to button center */}
+          <AnimatePresence>
+            {highlight && (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                className="absolute left-full top-1/2 -translate-y-1/2 ml-3 flex items-center gap-1.5 pointer-events-none z-20"
+              >
+                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] border-r-primary-500" />
+                <div className="px-3 py-1.5 bg-primary-500 rounded-lg shadow-lg shadow-primary-500/30 whitespace-nowrap">
+                  <span className="text-[11px] font-semibold text-white">Click to Run Pipeline</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </button>
-        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 rounded-lg text-[10px] text-gray-300 whitespace-nowrap z-10">
-          {isRunning ? 'Running...' : 'Run Pipeline'}
-        </div>
+        {!highlight && (
+          <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-800 rounded-lg text-[10px] text-gray-300 whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            {isRunning ? 'Running...' : 'Run Pipeline'}
+          </div>
+        )}
       </div>
 
       <div className="relative group shrink-0">
