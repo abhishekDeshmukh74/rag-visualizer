@@ -27,7 +27,37 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
           <span className="text-primary-300 font-medium">
             {chunkEmbeddings[0]?.dimensions || '?'}-dimensional
           </span>{' '}
-          vector embedding.
+          vector embedding using{' '}
+          <span className="text-primary-300 font-medium">all-MiniLM-L6-v2</span>.
+        </div>
+
+        {/* Model comparison table */}
+        <div className="rounded-lg border border-gray-700/50 overflow-hidden text-xs">
+          <div className="grid grid-cols-2 bg-gray-800/80 px-3 py-2 text-gray-400 font-medium uppercase tracking-wide">
+            <span>Model</span>
+            <span className="text-right">Dimensions</span>
+          </div>
+          {[
+            { name: 'all-MiniLM-L6-v2', dims: '384D', active: true },
+            { name: 'bge-small-en-v1.5', dims: '384D', active: false },
+            { name: 'bge-base-en-v1.5', dims: '768D', active: false },
+            { name: 'bge-large-en-v1.5', dims: '1024D', active: false },
+            { name: 'text-embedding-ada-002', dims: '1536D', active: false },
+            { name: 'text-embedding-3-small', dims: '1536D', active: false },
+            { name: 'text-embedding-3-large', dims: '3072D', active: false },
+          ].map((m) => (
+            <div
+              key={m.name}
+              className={`grid grid-cols-2 px-3 py-2 border-t border-gray-700/40 ${
+                m.active ? 'bg-primary-900/30 text-primary-300' : 'text-gray-400'
+              }`}
+            >
+              <span className="font-mono">{m.name}</span>
+              <span className={`text-right font-medium ${m.active ? 'text-primary-300' : 'text-gray-300'}`}>
+                {m.dims}
+              </span>
+            </div>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

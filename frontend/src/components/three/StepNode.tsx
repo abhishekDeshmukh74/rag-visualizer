@@ -11,12 +11,12 @@ function createTextTexture(text: string, color: string): THREE.CanvasTexture {
   const ctx = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = 'bold 36px Inter, system-ui, sans-serif';
-  ctx.textAlign = 'center';
+  ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 8;
   ctx.fillStyle = color;
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+  ctx.fillText(text, canvas.width - 12, canvas.height / 2);
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
   return tex;
@@ -166,8 +166,8 @@ export default function StepNode({
         />
       )}
 
-      {/* Text label in front of the node */}
-      <sprite position={[0, -0.65, 0.5]} scale={[1.8, 0.45, 1]}>
+      {/* Text label to the left of the node */}
+      <sprite position={[-1.1, 0, 0.5]} scale={[1.8, 0.45, 1]}>
         <spriteMaterial
           map={labelTexture}
           transparent

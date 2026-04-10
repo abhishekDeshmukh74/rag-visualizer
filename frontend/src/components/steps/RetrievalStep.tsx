@@ -12,6 +12,147 @@ interface RetrievalStepProps {
   onConfigChange: (updates: Partial<PipelineConfig>) => void;
 }
 
+// ── Semantic Space 3-D XYZ visualisation ─────────────────────────────────────
+function SemanticSpaceViz() {
+  const ox = 145, oy = 205; // origin in SVG coords
+
+  // Isometric axis tips
+  const axX = { x: 238, y: 248 };   // dim 1  →
+  const axY = { x: ox,  y:  85 };   // dim 2  ↑
+  const axZ = { x:  52, y: 248 };   // dim 3  ←
+
+  // Words in the leave/time-off semantic cluster
+  const cluster = [
+    { label: 'time-off', cx: 225, cy: 120 },
+    { label: 'vacation',  cx: 243, cy: 134 },
+    { label: 'leave',     cx: 213, cy: 143 },
+    { label: 'PTO',       cx: 237, cy: 155 },
+    { label: 'sick day',  cx: 218, cy: 165 },
+  ];
+
+  // Unrelated words — far from cluster
+  const others = [
+    { label: 'invoice',  cx: 100, cy: 195 },
+    { label: 'server',   cx: 116, cy: 180 },
+    { label: 'database', cx:  92, cy: 177 },
+  ];
+
+  // Query vector endpoint
+  const qx = 229, qy = 127;
+
+  return (
+    <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+      <div className="flex items-start gap-2 mb-1">
+        <span className="text-sm font-medium text-gray-300">Semantic Search in Vector Space</span>
+      </div>
+      <div className="text-xs text-gray-500 mb-3 space-y-2">
+        <p>
+          Embeddings place words into a high-dimensional space where <em className="text-gray-400">meaning</em> determines
+          distance — not spelling. Cosine similarity finds the nearest neighbours instantly.
+        </p>
+        <p className="text-gray-400 font-medium">Knowledge base (4 pre-loaded documents):</p>
+        <ul className="space-y-1 pl-1">
+          {[
+            { icon: '🔑', label: 'Password Reset FAQ',       desc: 'account recovery & auth flows' },
+            { icon: '↩️', label: 'Return & Refund Policy',   desc: 'order returns, refunds, timelines' },
+            { icon: '🧭', label: 'Employee Onboarding Guide', desc: 'day-1 setup, tools, processes' },
+            { icon: '🌴', label: 'Leave Policy',              desc: 'PTO, sick days, vacation rules' },
+          ].map(({ icon, label, desc }) => (
+            <li key={label} className="flex items-start gap-2">
+              <span>{icon}</span>
+              <span>
+                <span className="text-gray-300 font-medium">{label}</span>
+                <span className="text-gray-600"> — {desc}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p>
+          A query about <em className="text-gray-400">"time-off"</em> retrieves chunks
+          mentioning <em className="text-gray-400">"vacation"</em>, <em className="text-gray-400">"PTO"</em> and{' '}
+          <em className="text-gray-400">"sick day"</em> — even if those exact words never appear in the query.
+        </p>
+      </div>
+
+      <svg viewBox="0 0 320 265" className="w-full" style={{ height: 230 }}>
+        <defs>
+          <marker id="qa" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="#5c7cfa" />
+          </marker>
+        </defs>
+
+        {/* Axes */}
+        <line x1={ox} y1={oy} x2={axX.x} y2={axX.y} stroke="#374151" strokeWidth={1.5} />
+        <line x1={ox} y1={oy} x2={axY.x} y2={axY.y} stroke="#374151" strokeWidth={1.5} />
+        <line x1={ox} y1={oy} x2={axZ.x} y2={axZ.y} stroke="#374151" strokeWidth={1.5} />
+
+        {/* Axis tick-marks */}
+        {[0.33, 0.66, 1].map((t) => (
+          <g key={t}>
+            <circle cx={ox + (axX.x - ox) * t} cy={oy + (axX.y - oy) * t} r={2} fill="#374151" />
+            <circle cx={ox + (axY.x - ox) * t} cy={oy + (axY.y - oy) * t} r={2} fill="#374151" />
+            <circle cx={ox + (axZ.x - ox) * t} cy={oy + (axZ.y - oy) * t} r={2} fill="#374151" />
+          </g>
+        ))}
+
+        {/* Axis labels */}
+        <text x={axX.x + 4} y={axX.y + 4} fontSize={9} fill="#6b7280">dim₁</text>
+        <text x={axY.x - 18} y={axY.y - 4} fontSize={9} fill="#6b7280">dim₂</text>
+        <text x={axZ.x - 26} y={axZ.y + 4} fontSize={9} fill="#6b7280">dim₃</text>
+
+        {/* Cluster highlight */}
+        <ellipse cx={225} cy={143} rx={34} ry={33}
+          fill="rgba(92,124,250,0.07)"
+          stroke="rgba(92,124,250,0.35)"
+          strokeWidth={1}
+          strokeDasharray="4,2"
+        />
+
+        {/* Query vector */}
+        <line x1={ox} y1={oy} x2={qx} y2={qy}
+          stroke="#5c7cfa" strokeWidth={1.5}
+          strokeDasharray="5,3"
+          markerEnd="url(#qa)"
+        />
+        <text x={ox + (qx - ox) * 0.55 + 6} y={oy + (qy - oy) * 0.55 - 4}
+          fontSize={8} fill="#818cf8">query vector</text>
+
+        {/* Cosine similarity label */}
+        <text x={180} y={181} fontSize={8} fill="#5c7cfa" opacity={0.85}>
+          cosine sim ≈ 0.91
+        </text>
+
+        {/* Cluster word dots */}
+        {cluster.map((w) => (
+          <g key={w.label}>
+            <circle cx={w.cx} cy={w.cy} r={5} fill="#5c7cfa" opacity={0.85} />
+            <text x={w.cx + 7} y={w.cy + 3} fontSize={9} fill="#a5b4fc">{w.label}</text>
+          </g>
+        ))}
+
+        {/* Unrelated word dots */}
+        {others.map((w) => (
+          <g key={w.label}>
+            <circle cx={w.cx} cy={w.cy} r={4} fill="#1f2937" stroke="#4b5563" strokeWidth={1.2} />
+            <text x={w.cx + 6} y={w.cy + 3} fontSize={9} fill="#4b5563">{w.label}</text>
+          </g>
+        ))}
+
+        {/* Query endpoint dot */}
+        <circle cx={qx} cy={qy} r={5} fill="#facc15" />
+        <text x={qx + 7} y={qy - 3} fontSize={9} fill="#fde68a" fontWeight="bold">query</text>
+      </svg>
+
+      <div className="flex items-center gap-6 mt-1 text-[10px] text-gray-500">
+        <span><span className="inline-block w-2 h-2 rounded-full bg-primary-500 mr-1" />semantic cluster</span>
+        <span><span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1" />query vector</span>
+        <span><span className="inline-block w-2 h-2 rounded-full border border-gray-600 bg-gray-900 mr-1" />unrelated</span>
+      </div>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function RetrievalStep({
   similarityResults,
   topChunks,
@@ -35,6 +176,9 @@ export default function RetrievalStep({
       isActive={true}
     >
       <div className="space-y-6">
+        {/* Semantic space explainer */}
+        <SemanticSpaceViz />
+
         {/* Top-K control */}
         <div className="flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
           <label className="text-sm text-gray-400 whitespace-nowrap">

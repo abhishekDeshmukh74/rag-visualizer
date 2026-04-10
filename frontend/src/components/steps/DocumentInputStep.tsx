@@ -1,7 +1,7 @@
-import { FileText, Upload } from 'lucide-react';
+import { Upload, Database } from 'lucide-react';
 import StepCard from '../StepCard';
-import { SAMPLE_DOCUMENTS, PIPELINE_STEPS } from '../../lib/constants';
-import type { DocumentStats, SampleDocument } from '../../lib/types';
+import { PIPELINE_STEPS } from '../../lib/constants';
+import type { DocumentStats } from '../../lib/types';
 
 interface DocumentInputStepProps {
   documentText: string;
@@ -28,10 +28,6 @@ export default function DocumentInputStep({
   const step = PIPELINE_STEPS[0];
   const stats = documentText ? (documentStats || estimateStats(documentText)) : null;
 
-  const handleSampleClick = (sample: SampleDocument) => {
-    onDocumentChange(sample.text);
-  };
-
   return (
     <StepCard
       title={step.label}
@@ -40,38 +36,42 @@ export default function DocumentInputStep({
       isActive={true}
     >
       <div className="space-y-4">
-        {/* Sample documents */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Quick start with a sample document
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {SAMPLE_DOCUMENTS.map((sample) => (
-              <button
-                key={sample.id}
-                onClick={() => handleSampleClick(sample)}
-                className={`
-                  p-3 rounded-lg border text-left transition-all duration-200 text-sm
-                  ${documentText === sample.text
-                    ? 'border-primary-500 bg-primary-500/10 text-primary-300'
-                    : 'border-gray-700 bg-gray-800/50 text-gray-400 hover:border-gray-600 hover:bg-gray-800'
-                  }
-                `}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <FileText className="w-3.5 h-3.5" />
-                  <span className="font-medium text-gray-300">{sample.title}</span>
-                </div>
-                <p className="text-xs text-gray-500">{sample.description}</p>
-              </button>
-            ))}
+        {/* Knowledge base overview */}
+        <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50 space-y-3">
+          <div className="flex items-center gap-2">
+            <Database className="w-4 h-4 text-primary-400" />
+            <span className="text-sm font-medium text-gray-300">Pre-loaded Knowledge Base</span>
           </div>
+          <p className="text-xs text-gray-500">
+            We simulate a real company chatbot knowledge base using 4 pre-loaded documents.
+            Each represents a common enterprise content type:
+          </p>
+          <ul className="space-y-2">
+            {[
+              { icon: '🔑', label: 'Password Reset FAQ',        desc: 'Account recovery steps, auth flows, common errors' },
+              { icon: '↩️', label: 'Return & Refund Policy',    desc: 'Order returns, refund timelines, eligibility rules' },
+              { icon: '🧭', label: 'Employee Onboarding Guide', desc: 'Day-1 setup, tooling, team processes & policies' },
+              { icon: '🌴', label: 'Leave Policy',              desc: 'PTO, sick days, vacation accrual & approval flow' },
+            ].map(({ icon, label, desc }) => (
+              <li key={label} className="flex items-start gap-3 text-xs">
+                <span className="text-base leading-none mt-0.5">{icon}</span>
+                <span>
+                  <span className="text-gray-300 font-medium">{label}</span>
+                  <span className="text-gray-500"> — {desc}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-gray-500">
+            Select one below to run it through the full RAG pipeline — from chunking and
+            embedding to semantic retrieval and LLM-generated answers.
+          </p>
         </div>
 
         {/* Text input */}
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-2">
-            Or paste your own text
+            Document text
           </label>
           <textarea
             className="input-field min-h-[200px] resize-y font-mono text-sm"

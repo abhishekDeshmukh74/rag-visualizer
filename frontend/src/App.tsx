@@ -142,6 +142,8 @@ export default function App() {
               query={query}
               onQueryChange={setQuery}
               onClose={() => setShowPanel(false)}
+              onNext={goToNextStep}
+              onPrev={goToPrevStep}
             />
           )}
         </AnimatePresence>

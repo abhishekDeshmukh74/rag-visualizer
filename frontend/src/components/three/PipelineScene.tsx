@@ -31,7 +31,7 @@ function CameraControls({
     controls.maxPolarAngle = Math.PI * 0.75;
     controls.minPolarAngle = Math.PI * 0.2;
     controls.enableDamping = true;
-    controls.target.set(0, -0.4, 0);
+    controls.target.set(0, 0, 0);
     controlsRef.current = controls;
     return () => controls.dispose();
   }, [camera, gl]);
@@ -57,17 +57,19 @@ interface PipelineSceneProps {
 
 // Arrange steps diagonally: bottom-left to top-right
 const STEP_POSITIONS: Record<PipelineStep, [number, number, number]> = {
-  input:     [-4.5, -3.2, 0],
-  chunking:  [-3.2, -2.4, 0],
-  embedding: [-2.0, -1.6, 0],
-  vectordb:  [-0.8, -0.8, 0],
-  query:     [ 0.4,  0.0, 0],
-  retrieval: [ 1.6,  0.8, 0],
-  prompt:    [ 2.8,  1.6, 0],
-  answer:    [ 4.0,  2.4, 0],
+  ingestion: [-4.4, -3.6, 0],
+  input:     [-3.3, -2.7, 0],
+  chunking:  [-2.2, -1.8, 0],
+  embedding: [-1.1, -0.9, 0],
+  vectordb:  [ 0.0,  0.0, 0],
+  query:     [ 1.1,  0.9, 0],
+  retrieval: [ 2.2,  1.8, 0],
+  prompt:    [ 3.3,  2.7, 0],
+  answer:    [ 4.4,  3.6, 0],
 };
 
 const STEP_COLORS: Record<PipelineStep, string> = {
+  ingestion: '#f472b6',
   input:     '#818cf8',
   chunking:  '#6366f1',
   embedding: '#8b5cf6',
@@ -78,7 +80,7 @@ const STEP_COLORS: Record<PipelineStep, string> = {
   answer:    '#10b981',
 };
 
-const STEP_ORDER: PipelineStep[] = ['input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer'];
+const STEP_ORDER: PipelineStep[] = ['ingestion', 'input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer'];
 
 export default function PipelineScene({
   currentStep,
@@ -91,7 +93,7 @@ export default function PipelineScene({
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 0, 9], fov: 50 }}
+        camera={{ position: [0, 0, 13], fov: 50 }}
         style={{ background: 'transparent' }}
         gl={{ alpha: true, antialias: true }}
       >

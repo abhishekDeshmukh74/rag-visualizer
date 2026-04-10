@@ -10,10 +10,11 @@ import {
   MessageSquare,
   Sparkles,
   Check,
+  Upload,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles,
+  FileText, Scissors, Binary, Search, Filter, MessageSquare, Sparkles, Upload,
 };
 
 interface PipelineNavProps {
