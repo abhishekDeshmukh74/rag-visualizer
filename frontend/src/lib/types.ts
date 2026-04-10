@@ -46,6 +46,7 @@ export interface PipelineResult {
 }
 
 export type PipelineStep =
+  | 'ingestion'
   | 'input'
   | 'chunking'
   | 'embedding'
@@ -60,6 +61,7 @@ export interface StepInfo {
   label: string;
   description: string;
   educationalText: string;
+  educationalItems?: { label: string; description: string }[];
   deepDiveText: string;
   icon: string;
 }

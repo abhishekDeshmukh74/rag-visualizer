@@ -2,11 +2,21 @@ import type { StepInfo, SampleDocument } from './types';
 
 export const PIPELINE_STEPS: StepInfo[] = [
   {
+    id: 'ingestion',
+    label: 'Document Ingestion',
+    description: 'Load documents from company knowledge sources',
+    educationalText:
+      'Before retrieval can happen, documents must be ingested from their sources — knowledge bases, helpdesks, wikis, PDFs, or databases. This is the data foundation of any company chatbot.',
+    deepDiveText:
+      'Production RAG pipelines include ingestion pipelines that continuously crawl and sync documents from sources like Confluence, SharePoint, Notion, Zendesk, or CRM databases. Documents go through extraction (converting PDFs/HTML to plain text), deduplication, and metadata tagging. Incremental sync ensures the vector store stays current when source documents change. Ingestion quality — clean, structured, deduplicated content — directly determines what the chatbot can and cannot answer.',
+    icon: 'Upload',
+  },
+  {
     id: 'input',
     label: 'Document Input',
     description: 'Paste or select a document to process',
     educationalText:
-      'RAG starts with a knowledge source — a document, FAQ, article, or any text you want the AI to reference when answering questions.',
+      'RAG starts with knowledge sources that you want the AI to reference when answering questions.',
     deepDiveText:
       'The quality of your input document directly determines what the system can retrieve. Documents should be clean, well-structured text. Noisy data (HTML tags, boilerplate, duplicates) degrades retrieval quality. In production, a preprocessing pipeline typically handles extraction, cleaning, and deduplication before documents enter the RAG system.',
     icon: 'FileText',
@@ -17,6 +27,14 @@ export const PIPELINE_STEPS: StepInfo[] = [
     description: 'Split the document into smaller pieces',
     educationalText:
       'Chunking breaks large documents into smaller pieces so retrieval can search them efficiently. Bad chunking can split meaning or hide useful context. Chunk size and overlap are critical parameters.',
+    educationalItems: [
+      { label: 'Character / Fixed-size', description: 'Split every N characters regardless of content structure' },
+      { label: 'Sentence-based', description: 'Split on sentence boundaries to preserve grammatical meaning' },
+      { label: 'Recursive', description: 'Split on paragraphs → sentences → words, respecting document hierarchy' },
+      { label: 'Token-based', description: 'Split by LLM token count to stay within model context windows' },
+      { label: 'Semantic', description: 'Split where topic shifts occur using embedding similarity' },
+      { label: 'Sliding window', description: 'Fixed-size chunks with overlap to avoid losing context at boundaries' },
+    ],
     deepDiveText:
       'Common strategies include fixed-size character chunking, sentence-based splitting, and recursive chunking that respects paragraph/section boundaries. Smaller chunks improve precision but may lose context. Larger chunks preserve context but reduce retrieval specificity. Overlap (typically 10-20% of chunk size) helps avoid losing information at boundaries. Advanced methods use semantic chunking — splitting where topic shifts naturally occur.',
     icon: 'Scissors',
@@ -85,30 +103,6 @@ export const PIPELINE_STEPS: StepInfo[] = [
 
 export const SAMPLE_DOCUMENTS: SampleDocument[] = [
   {
-    id: 'redis',
-    title: 'Redis info',
-    description: 'A technical overview of Redis performance',
-    text: `Redis is an open-source, in-memory data structure store used as a database, cache, message broker, and streaming engine. Redis provides data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes, and streams.
-
-Redis achieves its remarkable speed primarily because it stores all data in memory (RAM) rather than on disk. Accessing data in memory is orders of magnitude faster than reading from a hard drive or even an SSD. This is the single most important factor behind Redis's performance.
-
-Redis uses a single-threaded event loop model for processing commands. While this might seem like a limitation, it actually eliminates the overhead of context switching and locking that multi-threaded systems face. The single thread processes commands sequentially, which also ensures that operations are atomic without the need for locks.
-
-The event loop in Redis is built on the I/O multiplexing model. It uses system calls like epoll (Linux), kqueue (BSD/macOS), and select to handle many client connections without creating a thread for each connection. This allows Redis to handle tens of thousands of connections simultaneously with very low overhead.
-
-Redis uses optimized data structures internally. For example, small hashes are stored as ziplists instead of full hash tables, and small sets use intsets. These compact representations reduce memory usage and improve cache locality, which helps performance even further.
-
-Redis supports pipelining, which allows a client to send multiple commands without waiting for the response of each one. The server processes all the commands and sends back responses in bulk. This dramatically reduces network round-trip time, especially for batch operations.
-
-Persistence in Redis is handled through RDB snapshots and AOF (Append Only File) logging. RDB creates point-in-time snapshots of the dataset at configurable intervals using a forked child process, so the main thread is never blocked by disk writes. AOF logs every write operation and can be configured with different fsync policies.
-
-Redis Cluster provides horizontal scaling by automatically sharding data across multiple Redis nodes. Each node handles a subset of the hash slot space (16384 slots total). This allows Redis to scale beyond the memory limits of a single machine while maintaining its performance characteristics.
-
-For caching use cases, Redis supports configurable eviction policies like LRU (Least Recently Used), LFU (Least Frequently Used), random eviction, and TTL-based expiry. These policies allow Redis to manage memory effectively when the dataset exceeds available RAM.
-
-Redis also supports Lua scripting, which allows you to execute complex operations atomically on the server side. This reduces network round trips and ensures that multi-step operations are performed without interruption, which is especially useful for distributed locking and rate limiting.`,
-  },
-  {
     id: 'password-reset',
     title: 'Password Reset FAQ',
     description: 'Common questions about resetting passwords',
@@ -145,28 +139,112 @@ What should I do if someone else reset my password?
 If you receive a password reset email that you did not request, do not click the link. Instead, log in to your account immediately and change your password. Enable two-factor authentication for additional security. If you cannot access your account, contact our support team immediately.`,
   },
   {
-    id: 'ml-basics',
-    title: 'Machine Learning Basics',
-    description: 'Introduction to core ML concepts',
-    text: `Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. Instead of writing rules by hand, machine learning algorithms build models from data and use those models to make predictions or decisions.
+    id: 'return-policy',
+    title: 'Return & Refund Policy',
+    description: 'E-commerce returns and refunds support doc',
+    text: `How do I return an item?
 
-There are three main types of machine learning: supervised learning, unsupervised learning, and reinforcement learning. Each type addresses different kinds of problems and uses different approaches to learn from data.
+To return an item, log in to your account and go to "My Orders". Find the order containing the item you want to return and click "Request Return". Select the reason for the return and choose your preferred return method. You will receive a prepaid return shipping label by email within 24 hours. Pack the item securely and drop it off at any authorized shipping location.
 
-Supervised learning is the most common type. In supervised learning, the algorithm learns from labeled training data. Each training example consists of an input and the corresponding correct output. The algorithm learns to map inputs to outputs by finding patterns in the training data. Common supervised learning tasks include classification (predicting a category) and regression (predicting a number).
+What is the return window?
 
-Unsupervised learning works with unlabeled data. The algorithm tries to find hidden patterns or structure in the data without being told what to look for. Common unsupervised learning tasks include clustering (grouping similar items), dimensionality reduction (simplifying data while preserving important information), and anomaly detection (finding unusual data points).
+Most items can be returned within 30 days of delivery. Electronics and software have a 15-day return window. Sale items marked as "Final Sale" cannot be returned or exchanged. Items must be in their original condition with all tags attached and original packaging intact.
 
-Reinforcement learning is inspired by behavioral psychology. An agent learns to make decisions by interacting with an environment. The agent receives rewards or penalties based on its actions and learns to maximize cumulative rewards over time. Reinforcement learning is used in robotics, game playing, and autonomous vehicles.
+How long does a refund take?
 
-A machine learning model is trained through a process of optimization. The model starts with random parameters and gradually adjusts them to minimize a loss function, which measures how far the model's predictions are from the correct answers. This process is called training or fitting the model.
+Once we receive your returned item, we inspect it within 2-3 business days. Approved refunds are processed to your original payment method within 5-7 business days. Credit card refunds may take an additional 3-5 business days to appear on your statement depending on your bank. We will send a confirmation email when the refund is processed.
 
-Overfitting is a common problem in machine learning. It occurs when a model learns the training data too well, including its noise and random fluctuations. An overfitted model performs well on training data but poorly on new, unseen data. Techniques like regularization, cross-validation, and using more training data help prevent overfitting.
+Can I exchange an item instead of returning it?
 
-Feature engineering is the process of selecting and transforming the input variables (features) used by a machine learning model. Good features can dramatically improve model performance. Feature engineering often requires domain expertise and is considered one of the most important and time-consuming parts of building a machine learning system.
+Yes, you can exchange an item for a different size, color, or style. Go to "My Orders", select the item, and click "Exchange". Exchanges are processed as a return for store credit and a new order. You will receive priority shipping on your exchange order at no additional cost.
 
-Neural networks are a class of machine learning models inspired by the structure of the brain. They consist of layers of interconnected nodes (neurons) that process information. Deep learning refers to neural networks with many layers. Deep learning has achieved breakthrough results in image recognition, natural language processing, and speech recognition.
+What items cannot be returned?
 
-The bias-variance tradeoff is a fundamental concept in machine learning. Bias refers to errors from overly simplistic models that underfit the data. Variance refers to errors from overly complex models that overfit the data. The goal is to find the right balance between bias and variance for optimal model performance.`,
+The following items are non-returnable: personalized or custom-made items, digital downloads and gift cards, perishable goods, items that have been used or washed, and intimate apparel for hygiene reasons. If you received a damaged or defective item, please contact customer support within 48 hours of delivery.
+
+How do I return a gift?
+
+If you received a gift and want to return it, you can do so without the original purchaser knowing. Use the gift return option on our website and enter your order number or gift receipt. You will receive store credit for the return value. Gift returns do not require the original payment method.
+
+Do I need to pay for return shipping?
+
+For standard returns, customers are responsible for return shipping costs. If the return is due to our error — wrong item, defective product, or damage during shipping — we will provide a prepaid return label at no charge. For exchanges, we cover the return shipping cost. Free returns are available to premium members.
+
+What happens if my return is damaged in transit?
+
+We recommend keeping proof of your return shipment until your refund is confirmed. If your return is damaged during transit, contact our support team with your tracking number and photos of the damage. We will work with the carrier to resolve the issue and ensure you receive your refund.`,
+  },
+  {
+    id: 'leave-policy',
+    title: 'Leave Policy',
+    description: 'Employee leave types, eligibility, and procedures',
+    text: `What types of leave are available?
+
+The company offers several types of leave: Paid Time Off (PTO), Sick Leave, Parental Leave, Bereavement Leave, Jury Duty Leave, and Unpaid Leave of Absence. Each leave type has its own eligibility criteria, accrual rules, and approval process. Full details for each leave type are outlined in this policy document and in the employee handbook available on the HR portal.
+
+How do I request leave?
+
+All leave requests must be submitted through the HR portal under "Time Off Requests". For planned leave (vacations, appointments), submit requests at least 5 business days in advance. For unplanned leave (illness, emergency), notify your manager and HR as soon as possible — same day if feasible. Leave requests are subject to manager approval and team capacity considerations.
+
+How much PTO do employees accrue?
+
+Full-time employees accrue PTO at the following rates based on tenure: 0–2 years: 15 days per year (1.25 days/month); 2–5 years: 18 days per year (1.5 days/month); 5+ years: 22 days per year (~1.83 days/month). Part-time employees accrue PTO on a prorated basis. PTO carries over up to a maximum of 30 days at the end of each calendar year. Unused PTO above 30 days is forfeited.
+
+What is the sick leave policy?
+
+Employees receive 10 days of sick leave per calendar year, which does not carry over. Sick leave can be used for personal illness, medical appointments, or to care for an immediate family member. For absences longer than 3 consecutive days, a doctor's note may be required. Sick leave is separate from PTO and cannot be used interchangeably.
+
+What is the parental leave policy?
+
+Primary caregivers receive 16 weeks of fully paid parental leave following the birth, adoption, or foster placement of a child. Secondary caregivers receive 4 weeks of fully paid parental leave. Leave must be taken within 12 months of the child's arrival. To initiate parental leave, notify HR at least 30 days in advance when possible and complete the parental leave request form in the HR portal.
+
+How does bereavement leave work?
+
+Employees are entitled to up to 5 paid days of bereavement leave for the death of an immediate family member (spouse, child, parent, sibling). Up to 3 paid days are provided for the death of an extended family member (grandparent, in-law, aunt/uncle). Additional unpaid leave may be granted at manager and HR discretion. Submit bereavement leave requests through the HR portal or notify your manager directly.
+
+Can I take unpaid leave?
+
+Employees who have exhausted their paid leave balances may request an unpaid leave of absence for personal or medical reasons. Requests for unpaid leave longer than 2 weeks require HR and department head approval. Your position will be held for up to 12 weeks for qualifying medical or family leave under FMLA. Job protection beyond 12 weeks is not guaranteed and is subject to business needs.
+
+What happens to my benefits during leave?
+
+Company-sponsored health, dental, and vision benefits remain active during paid leave. During unpaid leave, employees may continue benefits coverage by paying their portion of the premium. 401(k) contributions pause during unpaid leave and resume upon return. Accrual of PTO and sick leave is paused during unpaid leave longer than 30 days.`,
+  },
+  {
+    id: 'onboarding',
+    title: 'Employee Onboarding FAQ',
+    description: 'Internal HR chatbot knowledge base',
+    text: `When does my first day start?
+
+Your first day will be confirmed in the welcome email you received from HR. Plan to arrive 15 minutes early. You will be greeted by your onboarding coordinator at the main reception. Bring a valid government-issued ID for badge creation and I-9 verification. If you are onboarding remotely, check your email for video call instructions and equipment delivery confirmation.
+
+What equipment will I receive?
+
+You will receive a company laptop, headset, and any role-specific hardware requested by your manager. Remote employees typically receive equipment 1-2 business days before their start date. IT will send setup instructions and temporary login credentials. If there are any issues with your equipment, contact IT support at itsupport@company.com.
+
+How do I set up my company accounts?
+
+On your first day, IT will provide a welcome packet with your employee ID and temporary passwords. You will be required to change your password and set up multi-factor authentication (MFA) on your first login. Access to tools like Slack, Jira, Google Workspace, and department-specific systems will be provisioned within your first week. Submit additional access requests through the IT portal.
+
+What is the benefits enrollment deadline?
+
+You have 30 days from your start date to enroll in benefits including health insurance, dental, vision, and the 401(k) plan. Log in to the HR portal using your employee credentials to enroll. If you miss the enrollment window, you must wait until the next open enrollment period unless you have a qualifying life event. Contact hr@company.com with questions about plan options.
+
+Who is my go-to person for questions?
+
+Your manager is your primary contact for role-specific and team questions. Your onboarding buddy — assigned in your welcome email — is your peer resource for culture and day-to-day questions. HR business partners handle compensation, benefits, and policy questions. All contacts are listed in the company directory in the HR portal.
+
+How does the performance review process work?
+
+New employees complete a 90-day review with their manager — an informal check-in to discuss role expectations, initial projects, and feedback. Formal performance reviews happen company-wide in April and October. Goal-setting occurs in January and July. The performance management system is accessible through the HR portal.
+
+What are the remote work policies?
+
+The company operates on a hybrid model. Most roles require in-office presence 2-3 days per week, with Tuesdays and Thursdays as company-wide in-office days. Remote arrangements beyond the hybrid policy require manager and HR approval. Travel reimbursement and home office stipends are available for eligible roles — see the policy document in the HR portal for full details.
+
+How do I request time off?
+
+Submit time off requests through the HR portal under "Time Off". Full-time employees accrue 15 days of paid time off (PTO) per year plus 11 company holidays. New employees can use PTO after completing their first 90 days. For sick leave, notify your manager and HR on the same day. Extended leave policies for medical, parental, or bereavement situations are available in the employee handbook.`,
   },
 ];
 

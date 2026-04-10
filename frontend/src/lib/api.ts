@@ -1,5 +1,6 @@
 import type { PipelineConfig, PipelineResult } from './types';
 import { SAMPLE_DOCUMENTS } from './constants';
+import { getPrecomputedResult } from './interceptor';
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL
   ? `${import.meta.env.VITE_BACKEND_URL}/api`
@@ -10,6 +11,10 @@ export async function runPipeline(
   query: string,
   config: PipelineConfig
 ): Promise<PipelineResult> {
+  if (import.meta.env.VITE_USE_PRECOMPUTED === 'true') {
+    return getPrecomputedResult(documentText, query, config);
+  }
+
   // Check if the document matches a sample doc → send sample_id for fast path
   const matchedSample = SAMPLE_DOCUMENTS.find((s) => s.text === documentText);
 

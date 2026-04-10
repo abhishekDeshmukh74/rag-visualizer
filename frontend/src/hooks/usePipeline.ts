@@ -1,13 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
 import type { PipelineConfig, PipelineResult, PipelineStep } from '../lib/types';
 import { runPipeline } from '../lib/api';
-import { DEFAULT_CONFIG } from '../lib/constants';
+import { DEFAULT_CONFIG, SAMPLE_DOCUMENTS } from '../lib/constants';
 
 const STEP_ORDER: PipelineStep[] = [
-  'input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer',
+  'ingestion', 'input', 'chunking', 'embedding', 'vectordb', 'query', 'retrieval', 'prompt', 'answer',
 ];
 
 const STEP_DELAY_MS: Record<PipelineStep, number> = {
+  ingestion: 0,
   input: 0,
   chunking: 600,
   embedding: 800,
@@ -19,11 +20,11 @@ const STEP_DELAY_MS: Record<PipelineStep, number> = {
 };
 
 export function usePipeline() {
-  const [documentText, setDocumentText] = useState('');
+  const [documentText, setDocumentText] = useState(SAMPLE_DOCUMENTS[0].text);
   const [query, setQuery] = useState('');
   const [config, setConfig] = useState<PipelineConfig>(DEFAULT_CONFIG);
   const [result, setResult] = useState<PipelineResult | null>(null);
-  const [currentStep, setCurrentStep] = useState<PipelineStep>('input');
+  const [currentStep, setCurrentStep] = useState<PipelineStep>('ingestion');
   const [processingStep, setProcessingStep] = useState<PipelineStep | null>(null);
   const [completedSteps, setCompletedSteps] = useState<PipelineStep[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -33,13 +34,12 @@ export function usePipeline() {
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const animateSteps = useCallback(async (pipelineResult: PipelineResult) => {
-    const steps = STEP_ORDER.slice(1); // skip 'input'
-    const completed: PipelineStep[] = ['input'];
+    const steps = STEP_ORDER.slice(2); // skip 'ingestion' and 'input'
+    const completed: PipelineStep[] = ['ingestion', 'input'];
 
     for (const step of steps) {
       if (abortRef.current) break;
       setProcessingStep(step);
-      setCurrentStep(step);
       await delay(STEP_DELAY_MS[step]);
       if (abortRef.current) break;
       completed.push(step);
@@ -47,7 +47,6 @@ export function usePipeline() {
     }
 
     setProcessingStep(null);
-    setCurrentStep('answer');
     setResult(pipelineResult);
   }, []);
 
@@ -61,8 +60,7 @@ export function usePipeline() {
     setIsRunning(true);
     setError(null);
     setResult(null);
-    setCompletedSteps(['input']);
-    setCurrentStep('chunking');
+    setCompletedSteps(['ingestion', 'input']);
     setProcessingStep('chunking');
 
     try {
@@ -70,7 +68,6 @@ export function usePipeline() {
       await animateSteps(pipelineResult);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-      setCurrentStep('input');
       setProcessingStep(null);
     } finally {
       setIsRunning(false);
@@ -81,7 +78,7 @@ export function usePipeline() {
   const reset = useCallback(() => {
     abortRef.current = true;
     setResult(null);
-    setCurrentStep('input');
+    setCurrentStep('ingestion');
     setProcessingStep(null);
     setCompletedSteps([]);
     setError(null);
