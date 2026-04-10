@@ -70,8 +70,16 @@ uvicorn app.main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
+
+# (Optional) copy and edit environment variables
+cp .env.example .env
+
 npm run dev
 ```
+
+The `.env.example` documents two optional variables:
+- `VITE_USE_PRECOMPUTED=true` — serve fully offline from precomputed static files (no backend needed)
+- `VITE_BACKEND_URL` — override the default backend URL if not using the Vite proxy
 
 ### 5. Open the app
 
@@ -79,11 +87,12 @@ Visit **http://localhost:3000** in your browser.
 
 ## Sample Documents
 
-The app comes with built-in sample documents so you can try it instantly:
+The app comes with four built-in sample documents so you can try it instantly (no API key needed when `VITE_USE_PRECOMPUTED=true`):
 
-- **Why Redis is Fast** — Technical overview of Redis performance
-- **Password Reset FAQ** — Common support questions
-- **Machine Learning Basics** — Introduction to ML concepts
+- **Password Reset FAQ** — Common support questions about password resets
+- **Return & Refund Policy** — E-commerce returns and refunds support doc
+- **Leave Policy** — Employee leave types, eligibility, and procedures
+- **Onboarding Guide** — New-hire FAQ covering first day, benefits, tools, and policies
 
 ## Project Structure
 
@@ -121,7 +130,9 @@ The backend exposes a single `POST /api/pipeline/run` endpoint that:
 
 Every intermediate result is returned so the frontend can visualize each step.
 
-**Performance:** For the 3 built-in sample documents, steps 1-3 are precomputed at build time and loaded from `backend/precomputed/*.txt` on startup. Only the query embedding, similarity search, and LLM call run at request time, making sample-doc queries significantly faster. Custom documents still run the full pipeline.
+**Performance:** For the 4 built-in sample documents, steps 1-3 are precomputed at build time and loaded from `backend/precomputed/*.txt` on startup. Only the query embedding, similarity search, and LLM call run at request time, making sample-doc queries significantly faster. Custom documents still run the full pipeline.
+
+**Offline / demo mode:** Set `VITE_USE_PRECOMPUTED=true` in `frontend/.env` to serve fully precomputed responses from static files in `frontend/public/precomputed/` — no backend or API key required. Only works with the four built-in sample documents.
 
 ## License
 

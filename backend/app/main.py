@@ -54,10 +54,20 @@ def _load_precomputed() -> None:
             # Convert raw embeddings back to numpy once
             data["raw_embeddings_np"] = np.array(data["raw_embeddings"], dtype=np.float32)
             # Reconstruct ChunkModel list
-            from .models import ChunkModel, ChunkEmbeddingModel, DocumentStatsModel
+            from .models import ChunkModel, ChunkEmbeddingModel, DocumentStatsModel, SimilarityResultModel
             data["chunks_parsed"] = [ChunkModel(**c) for c in data["chunks"]]
             data["chunk_embeddings_parsed"] = [ChunkEmbeddingModel(**e) for e in data["chunk_embeddings"]]
             data["document_stats_parsed"] = DocumentStatsModel(**data["document_stats"])
+            # Reconstruct precomputed query results
+            data["queries_parsed"] = {}
+            for question, qdata in data.get("queries", {}).items():
+                data["queries_parsed"][question] = {
+                    "query_embedding": qdata["query_embedding"],
+                    "similarity_results": [SimilarityResultModel(**r) for r in qdata["similarity_results"]],
+                    "top_chunks": [SimilarityResultModel(**r) for r in qdata["top_chunks"]],
+                    "prompt": qdata["prompt"],
+                    "answer": qdata.get("answer"),
+                }
             _precomputed_cache[sid] = data
             logging.info("Loaded precomputed data for sample '%s'", sid)
         except Exception as exc:
@@ -135,7 +145,25 @@ async def run_pipeline(req: PipelineRequest):
             chunk_embeddings = precomputed["chunk_embeddings_parsed"]
             raw_chunk_embs = precomputed["raw_embeddings_np"]
 
-            # Only embed the user query
+            # Full fast path: query is also precomputed — skip all embedding + LLM
+            precomputed_query = precomputed["queries_parsed"].get(req.query)
+            if precomputed_query and precomputed_query["answer"] is not None:
+                logging.info(
+                    "Full precomputed fast-path for sample '%s', query='%s'",
+                    req.sample_id, req.query,
+                )
+                return PipelineResponse(
+                    document_stats=document_stats,
+                    chunks=chunks,
+                    chunk_embeddings=chunk_embeddings,
+                    query_embedding=precomputed_query["query_embedding"],
+                    similarity_results=precomputed_query["similarity_results"],
+                    top_chunks=precomputed_query["top_chunks"],
+                    prompt=precomputed_query["prompt"],
+                    answer=precomputed_query["answer"],
+                )
+
+            # Partial fast path: doc precomputed, query needs embedding
             model = get_embedding_model()
             raw_query_emb = await asyncio.to_thread(
                 lambda: np.array(list(model.embed([req.query]))[0], dtype=np.float32)
@@ -210,3 +238,8 @@ async def run_pipeline(req: PipelineRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=7000, reload=True)
