@@ -24,7 +24,7 @@ export default function QueryStep({ query, onQueryChange, queryEmbedding, embedd
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
           <input
             type="text"
-            className="input-field pl-10 text-lg"
+            className="input-field pl-10 text-xl"
             placeholder="Ask a question about the document..."
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
@@ -33,7 +33,7 @@ export default function QueryStep({ query, onQueryChange, queryEmbedding, embedd
 
         {queryEmbedding && (
           <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-            <div className="text-sm text-gray-400 mb-2">
+            <div className="text-base text-gray-400 mb-2">
               Query converted to a{' '}
               <span className="text-primary-300 font-medium">{embeddingDimensions ?? queryEmbedding.length}-dimensional</span>{' '}
               embedding vector
@@ -51,7 +51,7 @@ export default function QueryStep({ query, onQueryChange, queryEmbedding, embedd
                 />
               ))}
             </div>
-            <div className="text-[10px] text-gray-600 mt-1">
+            <div className="text-xs text-gray-600 mt-1">
               First 80 of {embeddingDimensions ?? queryEmbedding.length} dimensions
             </div>
           </div>

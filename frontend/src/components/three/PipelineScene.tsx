@@ -111,52 +111,55 @@ export default function PipelineScene({
       {/* Background particles */}
       <FloatingParticles count={300} radius={10} />
 
-      {/* Data flow connections */}
-      {STEP_ORDER.slice(0, -1).map((step, i) => {
-        const nextStep = STEP_ORDER[i + 1];
-        const stepIdx = STEP_ORDER.indexOf(currentStep);
-        const isFlowActive = isRunning
-          ? STEP_ORDER.indexOf(step) <= stepIdx
-          : completedSteps.includes(step) && completedSteps.includes(nextStep);
-        const isFlowCompleted = completedSteps.includes(step) && completedSteps.includes(nextStep);
+      {/* Offset group — shifts entire pipeline chain to the left */}
+      <group position={[-2, -0.5, 0]}>
+        {/* Data flow connections */}
+        {STEP_ORDER.slice(0, -1).map((step, i) => {
+          const nextStep = STEP_ORDER[i + 1];
+          const stepIdx = STEP_ORDER.indexOf(currentStep);
+          const isFlowActive = isRunning
+            ? STEP_ORDER.indexOf(step) <= stepIdx
+            : completedSteps.includes(step) && completedSteps.includes(nextStep);
+          const isFlowCompleted = completedSteps.includes(step) && completedSteps.includes(nextStep);
 
-        return (
-          <DataFlow
-            key={`${step}-${nextStep}`}
-            from={STEP_POSITIONS[step]}
-            to={STEP_POSITIONS[nextStep]}
-            isActive={isFlowActive || currentStep === step || currentStep === nextStep}
-            isCompleted={isFlowCompleted}
-            color={STEP_COLORS[step]}
-          />
-        );
-      })}
+          return (
+            <DataFlow
+              key={`${step}-${nextStep}`}
+              from={STEP_POSITIONS[step]}
+              to={STEP_POSITIONS[nextStep]}
+              isActive={isFlowActive || currentStep === step || currentStep === nextStep}
+              isCompleted={isFlowCompleted}
+              color={STEP_COLORS[step]}
+            />
+          );
+        })}
 
-      {/* Step nodes */}
-      {PIPELINE_STEPS.map((step) => (
-        <group key={step.id}>
-          <StepNode
-            position={STEP_POSITIONS[step.id]}
-            step={step.id}
-            label={step.label}
-            isActive={currentStep === step.id}
-            isCompleted={completedSteps.includes(step.id)}
-            isProcessing={processingStep === step.id}
-            onClick={() => onStepClick(step.id)}
-            color={STEP_COLORS[step.id]}
-          />
-        </group>
-      ))}
+        {/* Step nodes */}
+        {PIPELINE_STEPS.map((step) => (
+          <group key={step.id}>
+            <StepNode
+              position={STEP_POSITIONS[step.id]}
+              step={step.id}
+              label={step.label}
+              isActive={currentStep === step.id}
+              isCompleted={completedSteps.includes(step.id)}
+              isProcessing={processingStep === step.id}
+              onClick={() => onStepClick(step.id)}
+              color={STEP_COLORS[step.id]}
+            />
+          </group>
+        ))}
 
-      {/* Chunk cloud visualization - visible during retrieval */}
-      {result && (
-        <group position={[0, 2.5, -1]}>
-          <ChunkCloud
-            similarityResults={result.similarityResults}
-            visible={currentStep === 'retrieval' || currentStep === 'embedding'}
-          />
-        </group>
-      )}
+        {/* Chunk cloud visualization - visible during retrieval */}
+        {result && (
+          <group position={[0, 2.5, -1]}>
+            <ChunkCloud
+              similarityResults={result.similarityResults}
+              visible={currentStep === 'retrieval' || currentStep === 'embedding'}
+            />
+          </group>
+        )}
+      </group>
     </Canvas>
     </div>
   );

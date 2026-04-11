@@ -32,7 +32,7 @@ export default function ChunkingStep({
         {/* Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-base text-gray-400 mb-1">
               Chunk Size <span className="text-primary-400">{config.chunkSize}</span>
             </label>
             <input
@@ -44,14 +44,14 @@ export default function ChunkingStep({
               onChange={(e) => onConfigChange({ chunkSize: Number(e.target.value) })}
               className="w-full accent-primary-500"
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-1">
+            <div className="flex justify-between text-sm text-gray-600 mt-1">
               <span>50</span>
               <span>500</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-base text-gray-400 mb-1">
               Overlap <span className="text-primary-400">{config.chunkOverlap}</span>
             </label>
             <input
@@ -63,20 +63,20 @@ export default function ChunkingStep({
               onChange={(e) => onConfigChange({ chunkOverlap: Number(e.target.value) })}
               className="w-full accent-primary-500"
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-1">
+            <div className="flex justify-between text-sm text-gray-600 mt-1">
               <span>0</span>
               <span>100</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Strategy</label>
+            <label className="block text-base text-gray-400 mb-1">Strategy</label>
             <select
               value={config.chunkingStrategy}
               onChange={(e) =>
                 onConfigChange({ chunkingStrategy: e.target.value as 'sentence' | 'character' })
               }
-              className="input-field py-2 text-sm"
+              className="input-field py-2 text-base"
             >
               <option value="sentence">Sentence-based</option>
               <option value="character">Character-based</option>
@@ -85,14 +85,14 @@ export default function ChunkingStep({
         </div>
 
         {/* Overlap explanation */}
-        <p className="text-sm text-gray-400 leading-relaxed">
+        <p className="text-base text-gray-400 leading-relaxed">
           Overlap ensures that context is not lost at chunk boundaries. When chunks share a few overlapping characters or sentences, important information that spans two chunks is preserved in both, improving retrieval accuracy and preventing the model from missing relevant context.
         </p>
 
         {/* Chunks display */}
         <div className="flex items-center gap-2 mb-2">
           <Layers className="w-4 h-4 text-primary-400" />
-          <span className="text-sm font-medium text-gray-300">
+          <span className="text-base font-medium text-gray-300">
             {chunks.length} chunks generated
           </span>
         </div>
@@ -101,10 +101,10 @@ export default function ChunkingStep({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Source text with highlighting */}
           <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 max-h-[400px] overflow-y-auto">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
               Source Text
             </h3>
-            <p className="text-sm leading-relaxed text-gray-400 whitespace-pre-wrap">
+            <p className="text-base leading-relaxed text-gray-400 whitespace-pre-wrap">
               {hoveredChunk !== null ? (
                 <>
                   {documentText.slice(0, chunks[hoveredChunk]?.startIndex)}
@@ -124,7 +124,7 @@ export default function ChunkingStep({
 
           {/* Chunk list */}
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
               Generated Chunks
             </h3>
             {chunks.map((chunk, index) => (
@@ -134,7 +134,7 @@ export default function ChunkingStep({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
                 className={`
-                  p-3 rounded-lg border text-sm cursor-pointer transition-all duration-200
+                  p-3 rounded-lg border text-base cursor-pointer transition-all duration-200
                   ${hoveredChunk === index
                     ? 'border-primary-500 bg-primary-500/10 text-gray-200'
                     : 'border-gray-700/50 bg-gray-800/30 text-gray-400 hover:border-gray-600'
@@ -144,10 +144,10 @@ export default function ChunkingStep({
                 onMouseLeave={() => setHoveredChunk(null)}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-primary-400">
+                  <span className="text-sm font-medium text-primary-400">
                     Chunk #{chunk.id + 1}
                   </span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-sm text-gray-600">
                     {chunk.text.length} chars
                   </span>
                 </div>

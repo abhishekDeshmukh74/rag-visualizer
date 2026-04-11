@@ -22,7 +22,7 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
       isActive={true}
     >
       <div className="space-y-4">
-        <div className="text-sm text-gray-400">
+        <div className="text-base text-gray-400">
           Each chunk has been converted into a{' '}
           <span className="text-primary-300 font-medium">
             {chunkEmbeddings[0]?.dimensions || '?'}-dimensional
@@ -32,7 +32,7 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
         </div>
 
         {/* Model comparison table */}
-        <div className="rounded-lg border border-gray-700/50 overflow-hidden text-xs">
+        <div className="rounded-lg border border-gray-700/50 overflow-hidden text-sm">
           <div className="grid grid-cols-2 bg-gray-800/80 px-3 py-2 text-gray-400 font-medium uppercase tracking-wide">
             <span>Model</span>
             <span className="text-right">Dimensions</span>
@@ -74,7 +74,7 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
                 className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-primary-400">
+                  <span className="text-sm font-medium text-primary-400">
                     Chunk #{emb.chunkId + 1}
                   </span>
                   <button
@@ -89,7 +89,7 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
                     )}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                <p className="text-sm text-gray-500 line-clamp-2 mb-2">
                   {chunk?.text}
                 </p>
 
@@ -108,10 +108,10 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
                   ))}
                 </div>
                 <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-gray-600">
+                  <span className="text-xs text-gray-600">
                     First 60 of {emb.dimensions} dimensions
                   </span>
-                  <span className="text-[10px] text-gray-600">
+                  <span className="text-xs text-gray-600">
                     <span className="text-primary-500">■</span> positive{' '}
                     <span className="text-orange-400">■</span> negative
                   </span>
@@ -122,7 +122,7 @@ export default function EmbeddingStep({ chunks, chunkEmbeddings }: EmbeddingStep
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
-                    className="mt-3 p-2 bg-gray-900 rounded text-[10px] font-mono text-gray-500 max-h-24 overflow-auto"
+                    className="mt-3 p-2 bg-gray-900 rounded text-xs font-mono text-gray-500 max-h-24 overflow-auto"
                   >
                     [{emb.embedding.slice(0, 20).map((v) => v.toFixed(6)).join(', ')}
                     {emb.dimensions > 20 && `, ... (${emb.dimensions - 20} more)`}]

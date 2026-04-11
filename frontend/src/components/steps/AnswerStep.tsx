@@ -23,7 +23,7 @@ export default function AnswerStep({ answer, topChunks, query }: AnswerStepProps
       <div className="space-y-6">
         {/* Question recap */}
         <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-          <span className="text-xs text-gray-500 uppercase tracking-wider">Question</span>
+          <span className="text-sm text-gray-500 uppercase tracking-wider">Question</span>
           <p className="text-gray-300 mt-1">{query}</p>
         </div>
 
@@ -35,7 +35,7 @@ export default function AnswerStep({ answer, topChunks, query }: AnswerStepProps
         >
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="w-5 h-5 text-primary-400" />
-            <span className="text-sm font-semibold text-primary-300">Generated Answer</span>
+            <span className="text-base font-semibold text-primary-300">Generated Answer</span>
           </div>
           <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">{answer}</p>
         </motion.div>
@@ -44,7 +44,7 @@ export default function AnswerStep({ answer, topChunks, query }: AnswerStepProps
         <div>
           <div className="flex items-center gap-2 mb-3">
             <BookOpen className="w-4 h-4 text-green-400" />
-            <span className="text-sm font-medium text-gray-300">
+            <span className="text-base font-medium text-gray-300">
               Source Chunks ({topChunks.length})
             </span>
           </div>
@@ -55,14 +55,14 @@ export default function AnswerStep({ answer, topChunks, query }: AnswerStepProps
                 className="p-3 bg-green-500/5 border border-green-500/20 rounded-lg"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-green-400">
+                  <span className="text-sm font-medium text-green-400">
                     Chunk #{result.chunkId + 1}
                   </span>
-                  <span className="badge-green text-[10px]">
+                  <span className="badge-green text-xs">
                     {(result.score * 100).toFixed(1)}% relevance
                   </span>
                 </div>
-                <p className="text-sm text-gray-400 leading-relaxed">{result.chunk.text}</p>
+                <p className="text-base text-gray-400 leading-relaxed">{result.chunk.text}</p>
               </div>
             ))}
           </div>

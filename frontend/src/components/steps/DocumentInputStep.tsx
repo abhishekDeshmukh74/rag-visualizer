@@ -40,9 +40,9 @@ export default function DocumentInputStep({
         <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50 space-y-3">
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-primary-400" />
-            <span className="text-sm font-medium text-gray-300">Pre-loaded Knowledge Base</span>
+            <span className="text-base font-medium text-gray-300">Pre-loaded Knowledge Base</span>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-gray-500">
             We simulate a real company chatbot knowledge base using 4 pre-loaded documents.
             Each represents a common enterprise content type:
           </p>
@@ -53,8 +53,8 @@ export default function DocumentInputStep({
               { icon: '🧭', label: 'Employee Onboarding Guide', desc: 'Day-1 setup, tooling, team processes & policies' },
               { icon: '🌴', label: 'Leave Policy',              desc: 'PTO, sick days, vacation accrual & approval flow' },
             ].map(({ icon, label, desc }) => (
-              <li key={label} className="flex items-start gap-3 text-xs">
-                <span className="text-base leading-none mt-0.5">{icon}</span>
+              <li key={label} className="flex items-start gap-3 text-sm">
+                <span className="text-lg leading-none mt-0.5">{icon}</span>
                 <span>
                   <span className="text-gray-300 font-medium">{label}</span>
                   <span className="text-gray-500"> — {desc}</span>
@@ -62,7 +62,7 @@ export default function DocumentInputStep({
               </li>
             ))}
           </ul>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-gray-500">
             Select one below to run it through the full RAG pipeline — from chunking and
             embedding to semantic retrieval and LLM-generated answers.
           </p>
@@ -70,11 +70,11 @@ export default function DocumentInputStep({
 
         {/* Text input */}
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
+          <label className="block text-base font-medium text-gray-400 mb-2">
             Document text
           </label>
           <textarea
-            className="input-field min-h-[200px] resize-y font-mono text-sm"
+            className="input-field min-h-[200px] resize-y font-mono text-base"
             placeholder="Paste your document text here..."
             value={documentText}
             onChange={(e) => onDocumentChange(e.target.value)}

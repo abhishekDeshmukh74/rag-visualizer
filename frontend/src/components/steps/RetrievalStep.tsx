@@ -45,7 +45,7 @@ function SemanticSpaceViz() {
       <div className="flex items-start gap-2 mb-1">
         <span className="text-sm font-medium text-gray-300">Semantic Search in Vector Space</span>
       </div>
-      <div className="text-xs text-gray-500 mb-3 space-y-2">
+      <div className="text-sm text-gray-500 mb-3 space-y-2">
         <p>
           Embeddings place words into a high-dimensional space where <em className="text-gray-400">meaning</em> determines
           distance — not spelling. Cosine similarity finds the nearest neighbours instantly.
@@ -143,7 +143,7 @@ function SemanticSpaceViz() {
         <text x={qx + 7} y={qy - 3} fontSize={9} fill="#fde68a" fontWeight="bold">query</text>
       </svg>
 
-      <div className="flex items-center gap-6 mt-1 text-[10px] text-gray-500">
+      <div className="flex items-center gap-6 mt-1 text-xs text-gray-500">
         <span><span className="inline-block w-2 h-2 rounded-full bg-primary-500 mr-1" />semantic cluster</span>
         <span><span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1" />query vector</span>
         <span><span className="inline-block w-2 h-2 rounded-full border border-gray-600 bg-gray-900 mr-1" />unrelated</span>
@@ -181,7 +181,7 @@ export default function RetrievalStep({
 
         {/* Top-K control */}
         <div className="flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-          <label className="text-sm text-gray-400 whitespace-nowrap">
+          <label className="text-base text-gray-400 whitespace-nowrap">
             Top-K <span className="text-primary-400 font-medium">{config.topK}</span>
           </label>
           <input
@@ -192,7 +192,7 @@ export default function RetrievalStep({
             onChange={(e) => onConfigChange({ topK: Number(e.target.value) })}
             className="flex-1 accent-primary-500"
           />
-          <span className="text-xs text-gray-500">
+          <span className="text-sm text-gray-500">
             {config.topK} of {similarityResults.length} chunks selected
           </span>
         </div>
@@ -201,7 +201,7 @@ export default function RetrievalStep({
         <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-primary-400" />
-            <span className="text-sm font-medium text-gray-300">Similarity Scores</span>
+            <span className="text-base font-medium text-gray-300">Similarity Scores</span>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData} layout="vertical">
@@ -237,7 +237,7 @@ export default function RetrievalStep({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
             <span><span className="inline-block w-2 h-2 rounded-sm bg-primary-500 mr-1" /> Selected (top-k)</span>
             <span><span className="inline-block w-2 h-2 rounded-sm bg-gray-600 mr-1" /> Not selected</span>
           </div>
@@ -245,7 +245,7 @@ export default function RetrievalStep({
 
         {/* Selected chunks */}
         <div>
-          <h3 className="text-sm font-medium text-gray-300 mb-3">
+          <h3 className="text-base font-medium text-gray-300 mb-3">
             Top {config.topK} Retrieved Chunks
           </h3>
           <div className="space-y-2">
@@ -258,14 +258,14 @@ export default function RetrievalStep({
                 className="p-3 bg-primary-500/5 border border-primary-500/20 rounded-lg"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-primary-400">
+                  <span className="text-sm font-medium text-primary-400">
                     #{result.rank} — Chunk #{result.chunkId + 1}
                   </span>
                   <span className="badge-green">
                     {(result.score * 100).toFixed(1)}% match
                   </span>
                 </div>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <p className="text-base text-gray-400 leading-relaxed">
                   {result.chunk.text}
                 </p>
               </motion.div>

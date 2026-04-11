@@ -55,15 +55,15 @@ export default function StepDetailPanel({
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 30 }}
         transition={{ duration: 0.3 }}
-        className="w-full sm:w-[420px] max-h-full sm:max-h-[calc(100vh-20px)] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col"
+        className="w-full sm:w-[560px] max-h-full sm:max-h-[calc(100vh-20px)] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col"
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             {Icon && <Icon className="w-5 h-5 text-primary-400" />}
             <div>
-              <h2 className="text-sm font-bold text-gray-100">{stepInfo.label}</h2>
-              <p className="text-xs text-gray-500">{stepInfo.description}</p>
+              <h2 className="text-base font-bold text-gray-100">{stepInfo.label}</h2>
+              <p className="text-sm text-gray-500">{stepInfo.description}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -115,13 +115,13 @@ export default function StepDetailPanel({
           <button
             onClick={onPrev}
             disabled={isFirst}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-200 hover:bg-gray-800 disabled:hover:bg-transparent"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-200 hover:bg-gray-800 disabled:hover:bg-transparent"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             Prev
           </button>
 
-          <span className="text-[10px] text-gray-600">
+          <span className="text-xs text-gray-600">
             {currentIndex + 1} / {PIPELINE_STEPS.length}
           </span>
 
@@ -129,7 +129,7 @@ export default function StepDetailPanel({
             onClick={onNext}
             disabled={nextDisabled}
             title={requiresPipelineRun && !result ? 'Run the pipeline first' : undefined}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-200 hover:bg-gray-800 disabled:hover:bg-transparent"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-200 hover:bg-gray-800 disabled:hover:bg-transparent"
           >
             Next
             <ChevronRight className="w-3.5 h-3.5" />
@@ -150,11 +150,11 @@ function EducationalTip({ educationalText, educationalItems, deepDiveText }: { e
       <div className="flex items-start gap-2">
         <BookOpen className="w-3.5 h-3.5 text-primary-400 mt-0.5 shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-primary-200/70 leading-relaxed">{educationalText}</p>
+          <p className="text-sm text-primary-200/70 leading-relaxed">{educationalText}</p>
           {educationalItems && educationalItems.length > 0 && (
             <ul className="mt-2 space-y-1">
               {educationalItems.map((item) => (
-                <li key={item.label} className="flex items-start gap-1.5 text-xs">
+                <li key={item.label} className="flex items-start gap-1.5 text-sm">
                   <span className="mt-0.5 w-1 h-1 rounded-full bg-primary-400/60 shrink-0" />
                   <span>
                     <span className="text-primary-300 font-medium">{item.label}</span>
@@ -187,7 +187,7 @@ function EducationalTip({ educationalText, educationalItems, deepDiveText }: { e
             className="overflow-hidden"
           >
             <div className="mt-2 pt-2 border-t border-primary-500/10">
-              <p className="text-xs text-primary-200/60 leading-relaxed">{deepDiveText}</p>
+              <p className="text-sm text-primary-200/60 leading-relaxed">{deepDiveText}</p>
             </div>
           </motion.div>
         )}
@@ -219,20 +219,20 @@ const INGESTION_PIPELINE_STEPS = [
 function IngestionContent() {
   return (
     <>
-      <p className="text-xs text-gray-400 leading-relaxed">
+      <p className="text-sm text-gray-400 leading-relaxed">
         A company chatbot's knowledge comes from existing documents across the organization.
         Before retrieval can work, these sources must be crawled, extracted, and loaded.
       </p>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-400">Ingestion Pipeline</label>
+        <label className="text-base font-medium text-gray-400">Ingestion Pipeline</label>
         <div className="space-y-1.5">
           {INGESTION_PIPELINE_STEPS.map(({ step, label, desc, color, bg }) => (
             <div key={step} className={`flex items-start gap-3 p-2.5 rounded-lg border ${bg}`}>
-              <span className={`text-sm font-bold ${color} w-5 shrink-0 text-center`}>{step}</span>
+              <span className={`text-base font-bold ${color} w-5 shrink-0 text-center`}>{step}</span>
               <div>
-                <p className={`text-xs font-semibold ${color}`}>{label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                <p className={`text-sm font-semibold ${color}`}>{label}</p>
+                <p className="text-sm text-gray-500 mt-0.5">{desc}</p>
               </div>
             </div>
           ))}
@@ -240,14 +240,14 @@ function IngestionContent() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-400">Common Source Types</label>
+        <label className="text-base font-medium text-gray-400">Common Source Types</label>
         <div className="grid grid-cols-2 gap-2">
           {INGESTION_SOURCES.map(({ icon: Icon, label, example, color }) => (
             <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30">
               <Icon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${color}`} />
               <div>
-                <p className="text-xs font-medium text-gray-200">{label}</p>
-                <p className="text-[11px] text-gray-500">{example}</p>
+                <p className="text-sm font-medium text-gray-200">{label}</p>
+                <p className="text-xs text-gray-500">{example}</p>
               </div>
             </div>
           ))}
@@ -255,8 +255,8 @@ function IngestionContent() {
       </div>
 
       <div className="p-3 rounded-lg bg-primary-500/5 border border-primary-500/20 space-y-2">
-        <p className="text-xs font-medium text-primary-300">In this demo</p>
-        <p className="text-xs text-primary-200/60 leading-relaxed">
+        <p className="text-sm font-medium text-primary-300">In this demo</p>
+        <p className="text-sm text-primary-200/60 leading-relaxed">
           We simulate a real company knowledge base using 4 pre-loaded documents:
         </p>
         <ul className="space-y-1.5">
@@ -266,7 +266,7 @@ function IngestionContent() {
             { icon: '🧭', label: 'Employee Onboarding Guide', desc: 'day-1 setup, tools, processes' },
             { icon: '🌴', label: 'Leave Policy',              desc: 'PTO, sick days, vacation rules' },
           ].map(({ icon, label, desc }) => (
-            <li key={label} className="flex items-start gap-2 text-xs">
+            <li key={label} className="flex items-start gap-2 text-sm">
               <span className="leading-none mt-0.5">{icon}</span>
               <span>
                 <span className="text-primary-200/80 font-medium">{label}</span>
@@ -304,13 +304,13 @@ function InputContent({
   return (
     <>
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-400">Sample Documents</label>
+        <label className="text-base font-medium text-gray-400">Sample Documents</label>
         <div className="flex flex-wrap gap-1.5">
           {SAMPLE_DOCUMENTS.map((s) => (
             <button
               key={s.id}
               onClick={() => handleSample(s)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-sm font-medium transition-all ${
                 documentText === s.text
                   ? 'border-primary-500 bg-primary-500/10 text-primary-300'
                   : 'border-gray-700/50 bg-gray-800/30 text-gray-400 hover:border-gray-600'
@@ -321,30 +321,30 @@ function InputContent({
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-500 italic">
+        <p className="text-sm text-gray-500 italic">
           These documents represent real knowledge-base content — just as they'd arrive after being crawled and cleaned in the Ingestion stage.
         </p>
       </div>
 
       {documentText && (
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-400">Document Content</label>
+          <label className="text-base font-medium text-gray-400">Document Content</label>
           <textarea
             readOnly
             value={documentText}
-            className="w-full min-h-[160px] max-h-[260px] resize-y rounded-lg border border-gray-700/50 bg-gray-800/30 p-2.5 text-xs font-mono text-gray-300 leading-relaxed focus:outline-none"
+            className="w-full min-h-[160px] max-h-[260px] resize-y rounded-lg border border-gray-700/50 bg-gray-800/30 p-2.5 text-sm font-mono text-gray-300 leading-relaxed focus:outline-none"
           />
         </div>
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-400">Suggested Questions</label>
+        <label className="text-base font-medium text-gray-400">Suggested Questions</label>
         <div className="flex flex-wrap gap-2">
           {FIXED_QUESTIONS.map((question) => (
             <button
               key={question}
               onClick={() => onQueryChange(question)}
-              className={`text-left px-3 py-1.5 rounded-full border text-xs transition-all ${
+              className={`text-left px-3 py-1.5 rounded-full border text-sm transition-all ${
                 query === question
                   ? 'border-primary-500 bg-primary-500/10 text-primary-300'
                   : 'border-gray-700/50 bg-gray-800/30 text-gray-400 hover:border-gray-600 hover:text-gray-300'
@@ -359,14 +359,14 @@ function InputContent({
       {!result && (
         <div className="flex items-center gap-2.5 p-3 rounded-lg bg-primary-500/10 border border-primary-500/30">
           <Play className="w-4 h-4 text-primary-400 shrink-0" />
-          <p className="text-xs text-primary-300">
+          <p className="text-sm text-primary-300">
             Select a document and question above, then hit <span className="font-semibold">Run</span> to start the pipeline.
           </p>
         </div>
       )}
 
       {stats && (
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-sm">
           <span className="badge-blue">{stats.sentenceCount} sentences</span>
           <span className="badge-gray">{stats.wordCount} words</span>
           <span className="badge-amber">~{stats.estimatedTokens} tokens</span>
@@ -393,15 +393,15 @@ function ChunkingContent({
     <>
       <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/30">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">Chunk Size</span>
-          <span className="text-xs text-primary-400 font-medium">{config.chunkSize}</span>
+          <span className="text-sm text-gray-400">Chunk Size</span>
+          <span className="text-sm text-primary-400 font-medium">{config.chunkSize}</span>
         </div>
         <input type="range" min={50} max={500} step={10} value={config.chunkSize}
           onChange={(e) => onConfigChange({ chunkSize: Number(e.target.value) })}
           className="w-full accent-primary-500" />
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">Overlap</span>
-          <span className="text-xs text-primary-400 font-medium">{config.chunkOverlap}</span>
+          <span className="text-sm text-gray-400">Overlap</span>
+          <span className="text-sm text-primary-400 font-medium">{config.chunkOverlap}</span>
         </div>
         <input type="range" min={0} max={100} step={10} value={config.chunkOverlap}
           onChange={(e) => onConfigChange({ chunkOverlap: Number(e.target.value) })}
@@ -409,13 +409,13 @@ function ChunkingContent({
       </div>
       <div className="flex items-center gap-2">
         <Scissors className="w-3.5 h-3.5 text-primary-400" />
-        <span className="text-xs text-gray-300">{result.chunks.length} chunks</span>
+        <span className="text-sm text-gray-300">{result.chunks.length} chunks</span>
       </div>
       <div className="space-y-1.5 max-h-[250px] overflow-y-auto pr-1">
         {result.chunks.map((chunk, i) => (
           <div
             key={chunk.id}
-            className={`p-2 rounded-lg border text-xs transition-all cursor-pointer ${
+            className={`p-2 rounded-lg border text-sm transition-all cursor-pointer ${
               hoveredChunk === i
                 ? 'border-primary-500 bg-primary-500/10 text-gray-200'
                 : 'border-gray-700/30 bg-gray-800/20 text-gray-500 hover:border-gray-600'
@@ -424,8 +424,8 @@ function ChunkingContent({
             onMouseLeave={() => setHoveredChunk(null)}
           >
             <div className="flex justify-between mb-0.5">
-              <span className="text-xs text-primary-400 font-medium">Chunk #{chunk.id + 1}</span>
-              <span className="text-xs text-gray-600">{chunk.text.length} chars</span>
+              <span className="text-sm text-primary-400 font-medium">Chunk #{chunk.id + 1}</span>
+              <span className="text-sm text-gray-600">{chunk.text.length} chars</span>
             </div>
             <p className="line-clamp-2 leading-relaxed">{chunk.text}</p>
           </div>
@@ -442,14 +442,14 @@ function EmbeddingContent({ result }: { result: PipelineResult | null }) {
 
   return (
     <>
-      <div className="text-xs text-gray-400 mb-1">
+      <div className="text-sm text-gray-400 mb-1">
         Each chunk →{' '}
         <span className="text-primary-300 font-medium">{result.chunkEmbeddings[0]?.dimensions}D</span> vector
         {' '}using <span className="text-primary-300 font-medium">all-MiniLM-L6-v2</span>
       </div>
 
       {/* Model comparison table */}
-      <div className="rounded-lg border border-gray-700/50 overflow-hidden text-xs mb-1">
+      <div className="rounded-lg border border-gray-700/50 overflow-hidden text-sm mb-1">
         <div className="grid grid-cols-2 bg-gray-800/80 px-2.5 py-1.5 text-gray-500 font-medium uppercase tracking-wide">
           <span>Model</span>
           <span className="text-right">Dims</span>
@@ -477,7 +477,7 @@ function EmbeddingContent({ result }: { result: PipelineResult | null }) {
         {result.chunkEmbeddings.map((emb, i) => (
           <div key={emb.chunkId} className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/30">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-primary-400 font-medium">Chunk #{emb.chunkId + 1}</span>
+              <span className="text-sm text-primary-400 font-medium">Chunk #{emb.chunkId + 1}</span>
               <button onClick={() => setExpanded(expanded === i ? null : i)} className="text-gray-500 hover:text-gray-300">
                 {expanded === i ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
               </button>
@@ -492,7 +492,7 @@ function EmbeddingContent({ result }: { result: PipelineResult | null }) {
               ))}
             </div>
             {expanded === i && (
-              <div className="mt-2 p-1.5 bg-gray-900 rounded text-[11px] font-mono text-gray-600 max-h-16 overflow-auto">
+              <div className="mt-2 p-1.5 bg-gray-900 rounded text-xs font-mono text-gray-600 max-h-16 overflow-auto">
                 [{emb.embedding.slice(0, 10).map(v => v.toFixed(4)).join(', ')}, ...]
               </div>
             )}
@@ -511,28 +511,28 @@ function VectorDBContent({ result }: { result: PipelineResult | null }) {
 
   return (
     <>
-      <p className="text-xs text-gray-400 leading-relaxed">
+      <p className="text-sm text-gray-400 leading-relaxed">
         A vector database is a specialized storage system designed for embedding vectors. Unlike traditional databases that match on exact values, a vector DB indexes high-dimensional vectors so that nearest-neighbor queries run in sub-linear time — even across millions of records. This is what makes retrieval fast and scalable in production RAG systems.
       </p>
 
       <div className="grid grid-cols-2 gap-2">
         <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/30 text-center">
-          <span className="text-lg font-bold text-purple-400">{totalVectors}</span>
-          <p className="text-xs text-gray-500 mt-0.5">Vectors Stored</p>
+          <span className="text-xl font-bold text-purple-400">{totalVectors}</span>
+          <p className="text-sm text-gray-500 mt-0.5">Vectors Stored</p>
         </div>
         <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/30 text-center">
-          <span className="text-lg font-bold text-purple-400">{dims}D</span>
-          <p className="text-xs text-gray-500 mt-0.5">Dimensions</p>
+          <span className="text-xl font-bold text-purple-400">{dims}D</span>
+          <p className="text-sm text-gray-500 mt-0.5">Dimensions</p>
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wider">Indexed Chunks</span>
+        <span className="text-sm text-gray-500 uppercase tracking-wider">Indexed Chunks</span>
         <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1">
           {result.chunkEmbeddings.map((emb) => (
             <div key={emb.chunkId} className="p-2 bg-gray-800/20 border border-gray-700/30 rounded-lg flex items-center gap-2">
               <Database className="w-3 h-3 text-purple-400 shrink-0" />
-              <span className="text-xs text-purple-400 font-medium shrink-0">#{emb.chunkId + 1}</span>
+              <span className="text-sm text-purple-400 font-medium shrink-0">#{emb.chunkId + 1}</span>
               <div className="flex gap-px h-3 rounded overflow-hidden flex-1">
                 {emb.embedding.slice(0, 30).map((val, j) => (
                   <div key={j} className="flex-1" style={{
@@ -556,10 +556,10 @@ function QueryContent({ query, result }: { query: string; result: PipelineResult
   return (
     <>
       <div className="p-2.5 bg-gray-800/50 rounded-lg border border-gray-700/50">
-        <span className="text-xs text-gray-500 uppercase">Query</span>
-        <p className="text-sm text-gray-200 mt-0.5">{query}</p>
+        <span className="text-sm text-gray-500 uppercase">Query</span>
+        <p className="text-base text-gray-200 mt-0.5">{query}</p>
       </div>
-      <div className="text-xs text-gray-400">
+      <div className="text-sm text-gray-400">
         Embedded to <span className="text-amber-300 font-medium">{result.chunkEmbeddings[0]?.dimensions ?? result.queryEmbedding.length}D</span> vector
       </div>
       <div className="flex gap-px h-6 rounded overflow-hidden">
@@ -596,11 +596,11 @@ function RetrievalContent({
   return (
     <>
       <div className="flex items-center gap-3 p-2 bg-gray-800/30 rounded-lg border border-gray-700/30">
-        <span className="text-xs text-gray-400">Top-K</span>
+        <span className="text-sm text-gray-400">Top-K</span>
         <input type="range" min={1} max={Math.min(10, result.similarityResults.length)} value={config.topK}
           onChange={(e) => onConfigChange({ topK: Number(e.target.value) })}
           className="flex-1 accent-primary-500" />
-        <span className="text-xs text-primary-400 font-medium">{config.topK}</span>
+        <span className="text-sm text-primary-400 font-medium">{config.topK}</span>
       </div>
 
       <div className="h-[160px]">
@@ -622,10 +622,10 @@ function RetrievalContent({
         {result.topChunks.map(r => (
           <div key={r.chunkId} className="p-2 bg-primary-500/5 border border-primary-500/20 rounded-lg">
             <div className="flex justify-between mb-0.5">
-              <span className="text-xs text-primary-400 font-medium">#{r.rank} — Chunk #{r.chunkId + 1}</span>
-              <span className="badge-green text-[10px]">{(r.score * 100).toFixed(1)}%</span>
+              <span className="text-sm text-primary-400 font-medium">#{r.rank} — Chunk #{r.chunkId + 1}</span>
+              <span className="badge-green text-xs">{(r.score * 100).toFixed(1)}%</span>
             </div>
-            <p className="text-xs text-gray-400 line-clamp-2">{r.chunk.text}</p>
+            <p className="text-sm text-gray-400 line-clamp-2">{r.chunk.text}</p>
           </div>
         ))}
       </div>
@@ -646,14 +646,14 @@ function PromptContent({ result }: { result: PipelineResult | null }) {
   return (
     <>
       <div className="flex justify-between items-center">
-        <span className="text-xs text-gray-400">{result.prompt.length} chars</span>
-        <button onClick={handleCopy} className="btn-secondary text-xs py-1 px-2 flex items-center gap-1">
+        <span className="text-sm text-gray-400">{result.prompt.length} chars</span>
+        <button onClick={handleCopy} className="btn-secondary text-sm py-1 px-2 flex items-center gap-1">
           {copied ? <Check className="w-2.5 h-2.5" /> : <Copy className="w-2.5 h-2.5" />}
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
       <div className="p-3 bg-gray-800/30 rounded-lg border border-gray-700/30 max-h-[350px] overflow-auto">
-        <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono leading-relaxed">
+        <pre className="text-sm text-gray-400 whitespace-pre-wrap font-mono leading-relaxed">
           {result.prompt.split(/(CONTEXT:|QUESTION:|INSTRUCTIONS:)/g).map((part, i) =>
             ['CONTEXT:', 'QUESTION:', 'INSTRUCTIONS:'].includes(part)
               ? <span key={i} className="text-primary-400 font-bold">{part}</span>
@@ -671,31 +671,31 @@ function AnswerContent({ result, query }: { result: PipelineResult | null; query
   return (
     <>
       <div className="p-2.5 bg-gray-800/50 rounded-lg border border-gray-700/50">
-        <span className="text-xs text-gray-500 uppercase">Question</span>
-        <p className="text-xs text-gray-300 mt-0.5">{query}</p>
+        <span className="text-sm text-gray-500 uppercase">Question</span>
+        <p className="text-sm text-gray-300 mt-0.5">{query}</p>
       </div>
 
       <div className="p-3 bg-gradient-to-br from-primary-500/10 to-primary-600/5 border border-primary-500/20 rounded-xl">
         <div className="flex items-center gap-1.5 mb-2">
           <Sparkles className="w-4 h-4 text-primary-400" />
-          <span className="text-xs font-semibold text-primary-300">Answer</span>
+          <span className="text-sm font-semibold text-primary-300">Answer</span>
         </div>
-        <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+        <p className="text-base text-gray-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
       </div>
 
       <div>
         <div className="flex items-center gap-1.5 mb-2">
           <BookOpen className="w-3.5 h-3.5 text-green-400" />
-          <span className="text-xs font-medium text-gray-300">Sources</span>
+          <span className="text-sm font-medium text-gray-300">Sources</span>
         </div>
         <div className="space-y-1.5">
           {result.topChunks.map(r => (
             <div key={r.chunkId} className="p-2 bg-green-500/5 border border-green-500/20 rounded-lg">
               <div className="flex justify-between mb-0.5">
-                <span className="text-xs text-green-400 font-medium">Chunk #{r.chunkId + 1}</span>
-                <span className="badge-green text-[10px]">{(r.score * 100).toFixed(1)}%</span>
+                <span className="text-sm text-green-400 font-medium">Chunk #{r.chunkId + 1}</span>
+                <span className="badge-green text-xs">{(r.score * 100).toFixed(1)}%</span>
               </div>
-              <p className="text-xs text-gray-400 line-clamp-2">{r.chunk.text}</p>
+              <p className="text-sm text-gray-400 line-clamp-2">{r.chunk.text}</p>
             </div>
           ))}
         </div>
@@ -708,7 +708,7 @@ function EmptyState() {
   return (
     <div className="text-center py-8">
       <ChevronRight className="w-8 h-8 text-gray-700 mx-auto mb-2" />
-      <p className="text-xs text-gray-600">Run the pipeline to see results</p>
+      <p className="text-sm text-gray-600">Run the pipeline to see results</p>
     </div>
   );
 }
