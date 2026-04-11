@@ -93,7 +93,7 @@ export default function PipelineScene({
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 0, 13], fov: 50 }}
+        camera={{ position: [0, 0, 13], fov: 55 }}
         style={{ background: 'transparent' }}
         gl={{ alpha: true, antialias: true }}
       >
