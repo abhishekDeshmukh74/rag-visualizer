@@ -575,6 +575,122 @@ function QueryContent({ query, result }: { query: string; result: PipelineResult
   );
 }
 
+function SemanticSpaceViz() {
+  const ox = 200, oy = 340;
+  const axX = { x: 400, y: 400 };
+  const axY = { x: ox,  y:  60 };
+  const axZ = { x:   0, y: 400 };
+
+  const cluster = [
+    { label: 'time-off', cx: 330, cy:  90 },
+    { label: 'vacation',  cx: 390, cy: 140 },
+    { label: 'leave',     cx: 305, cy: 180 },
+    { label: 'PTO',       cx: 375, cy: 230 },
+    { label: 'sick day',  cx: 330, cy: 270 },
+  ];
+
+  const others = [
+    { label: 'invoice',  cx:  55, cy: 310 },
+    { label: 'server',   cx: 108, cy: 262 },
+    { label: 'database', cx:  38, cy: 245 },
+  ];
+
+  const qx = 358, qy = 130;
+
+  return (
+    <div className="p-2 bg-gray-800/30 rounded-lg border border-gray-700/50">
+      <div className="flex items-start gap-2 mb-1">
+        <span className="text-sm font-medium text-gray-300">Semantic Search in Vector Space</span>
+      </div>
+      <div className="text-sm text-gray-500 mb-1 space-y-1">
+        <p>
+          Embeddings place words into a high-dimensional space where <em className="text-gray-400">meaning</em> determines
+          distance — not spelling. Cosine similarity finds the nearest neighbours instantly.
+        </p>
+        <p className="text-gray-400 font-medium">Knowledge base (4 pre-loaded documents):</p>
+        <ul className="space-y-1 pl-1">
+          {[
+            { icon: '🔑', label: 'Password Reset FAQ',       desc: 'account recovery & auth flows' },
+            { icon: '↩️', label: 'Return & Refund Policy',   desc: 'order returns, refunds, timelines' },
+            { icon: '🧭', label: 'Employee Onboarding Guide', desc: 'day-1 setup, tools, processes' },
+            { icon: '🌴', label: 'Leave Policy',              desc: 'PTO, sick days, vacation rules' },
+          ].map(({ icon, label, desc }) => (
+            <li key={label} className="flex items-start gap-2">
+              <span>{icon}</span>
+              <span>
+                <span className="text-gray-300 font-medium">{label}</span>
+                <span className="text-gray-600"> — {desc}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p>
+          A query about <em className="text-gray-400">"time-off"</em> retrieves chunks
+          mentioning <em className="text-gray-400">"vacation"</em>, <em className="text-gray-400">"PTO"</em> and{' '}
+          <em className="text-gray-400">"sick day"</em> — even if those exact words never appear in the query.
+        </p>
+      </div>
+
+      <svg viewBox="-20 40 490 390" className="w-full" style={{ height: 320 }}>
+        <defs>
+          <marker id="qa-sdp" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill="#5c7cfa" />
+          </marker>
+        </defs>
+        <line x1={ox} y1={oy} x2={axX.x} y2={axX.y} stroke="#374151" strokeWidth={1.5} />
+        <line x1={ox} y1={oy} x2={axY.x} y2={axY.y} stroke="#374151" strokeWidth={1.5} />
+        <line x1={ox} y1={oy} x2={axZ.x} y2={axZ.y} stroke="#374151" strokeWidth={1.5} />
+        {[0.33, 0.66, 1].map((t) => (
+          <g key={t}>
+            <circle cx={ox + (axX.x - ox) * t} cy={oy + (axX.y - oy) * t} r={2.5} fill="#374151" />
+            <circle cx={ox + (axY.x - ox) * t} cy={oy + (axY.y - oy) * t} r={2.5} fill="#374151" />
+            <circle cx={ox + (axZ.x - ox) * t} cy={oy + (axZ.y - oy) * t} r={2.5} fill="#374151" />
+          </g>
+        ))}
+        <text x={axX.x + 5} y={axX.y + 5} fontSize={11} fill="#6b7280">dim₁</text>
+        <text x={axY.x - 22} y={axY.y - 6} fontSize={11} fill="#6b7280">dim₂</text>
+        <text x={axZ.x - 32} y={axZ.y + 5} fontSize={11} fill="#6b7280">dim₃</text>
+        <ellipse cx={348} cy={192} rx={68} ry={102}
+          fill="rgba(92,124,250,0.07)"
+          stroke="rgba(92,124,250,0.35)"
+          strokeWidth={1}
+          strokeDasharray="5,3"
+        />
+        <line x1={ox} y1={oy} x2={qx} y2={qy}
+          stroke="#5c7cfa" strokeWidth={1.5}
+          strokeDasharray="6,3"
+          markerEnd="url(#qa-sdp)"
+        />
+        <text x={ox + (qx - ox) * 0.52 + 8} y={oy + (qy - oy) * 0.52 - 6}
+          fontSize={10} fill="#818cf8">query vector</text>
+        <text x={210} y={298} fontSize={10} fill="#5c7cfa" opacity={0.85}>
+          cosine sim ≈ 0.91
+        </text>
+        {cluster.map((w) => (
+          <g key={w.label}>
+            <circle cx={w.cx} cy={w.cy} r={6} fill="#5c7cfa" opacity={0.85} />
+            <text x={w.cx + 10} y={w.cy + 4} fontSize={11} fill="#a5b4fc">{w.label}</text>
+          </g>
+        ))}
+        {others.map((w) => (
+          <g key={w.label}>
+            <circle cx={w.cx} cy={w.cy} r={5} fill="#1f2937" stroke="#4b5563" strokeWidth={1.5} />
+            <text x={w.cx + 8} y={w.cy + 4} fontSize={11} fill="#4b5563">{w.label}</text>
+          </g>
+        ))}
+        <circle cx={qx} cy={qy} r={6} fill="#facc15" />
+        <text x={qx + 10} y={qy - 4} fontSize={11} fill="#fde68a" fontWeight="bold">query</text>
+      </svg>
+
+      <div className="flex items-center gap-6 mt-1 text-xs text-gray-500">
+        <span><span className="inline-block w-2 h-2 rounded-full bg-primary-500 mr-1" />semantic cluster</span>
+        <span><span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1" />query vector</span>
+        <span><span className="inline-block w-2 h-2 rounded-full border border-gray-600 bg-gray-900 mr-1" />unrelated</span>
+      </div>
+    </div>
+  );
+}
+
 function RetrievalContent({
   result,
   config,
@@ -584,51 +700,54 @@ function RetrievalContent({
   config: PipelineConfig;
   onConfigChange: (u: Partial<PipelineConfig>) => void;
 }) {
-  if (!result) return <EmptyState />;
-
-  const topIds = new Set(result.topChunks.map(c => c.chunkId));
-  const chartData = result.similarityResults.map(r => ({
+  const topIds = result ? new Set(result.topChunks.map(c => c.chunkId)) : new Set<number>();
+  const chartData = result ? result.similarityResults.map(r => ({
     name: `#${r.chunkId + 1}`,
     score: Number((r.score * 100).toFixed(1)),
     isTop: topIds.has(r.chunkId),
-  }));
+  })) : [];
 
   return (
     <>
-      <div className="flex items-center gap-3 p-2 bg-gray-800/30 rounded-lg border border-gray-700/30">
-        <span className="text-sm text-gray-400">Top-K</span>
-        <input type="range" min={1} max={Math.min(10, result.similarityResults.length)} value={config.topK}
-          onChange={(e) => onConfigChange({ topK: Number(e.target.value) })}
-          className="flex-1 accent-primary-500" />
-        <span className="text-sm text-primary-400 font-medium">{config.topK}</span>
-      </div>
+      <SemanticSpaceViz />
+      {result && (
+        <>
+          <div className="flex items-center gap-3 p-2 bg-gray-800/30 rounded-lg border border-gray-700/30">
+            <span className="text-sm text-gray-400">Top-K</span>
+            <input type="range" min={1} max={Math.min(10, result.similarityResults.length)} value={config.topK}
+              onChange={(e) => onConfigChange({ topK: Number(e.target.value) })}
+              className="flex-1 accent-primary-500" />
+            <span className="text-sm text-primary-400 font-medium">{config.topK}</span>
+          </div>
 
-      <div className="h-[160px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} layout="vertical">
-            <XAxis type="number" domain={[0, 100]} tick={{ fill: '#6b7280', fontSize: 9 }} tickFormatter={v => `${v}%`} />
-            <YAxis dataKey="name" type="category" tick={{ fill: '#9ca3af', fontSize: 9 }} width={32} />
-            <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#f3f4f6', fontSize: 11 }} />
-            <Bar dataKey="score" radius={[0, 4, 4, 0]}>
-              {chartData.map((e, i) => (
-                <Cell key={i} fill={e.isTop ? '#5c7cfa' : '#374151'} opacity={e.isTop ? 1 : 0.5} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+          <div className="h-[160px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} layout="vertical">
+                <XAxis type="number" domain={[0, 100]} tick={{ fill: '#6b7280', fontSize: 9 }} tickFormatter={v => `${v}%`} />
+                <YAxis dataKey="name" type="category" tick={{ fill: '#9ca3af', fontSize: 9 }} width={32} />
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#f3f4f6', fontSize: 11 }} />
+                <Bar dataKey="score" radius={[0, 4, 4, 0]}>
+                  {chartData.map((e, i) => (
+                    <Cell key={i} fill={e.isTop ? '#5c7cfa' : '#374151'} opacity={e.isTop ? 1 : 0.5} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-      <div className="space-y-1.5">
-        {result.topChunks.map(r => (
-          <div key={r.chunkId} className="p-2 bg-primary-500/5 border border-primary-500/20 rounded-lg">
-            <div className="flex justify-between mb-0.5">
-              <span className="text-sm text-primary-400 font-medium">#{r.rank} — Chunk #{r.chunkId + 1}</span>
+          <div className="space-y-1.5">
+            {result.topChunks.map(r => (
+              <div key={r.chunkId} className="p-2 bg-primary-500/5 border border-primary-500/20 rounded-lg">
+                <div className="flex justify-between mb-0.5">
+                  <span className="text-sm text-primary-400 font-medium">#{r.rank} — Chunk #{r.chunkId + 1}</span>
               <span className="badge-green text-xs">{(r.score * 100).toFixed(1)}%</span>
             </div>
             <p className="text-sm text-gray-400 line-clamp-2">{r.chunk.text}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </>
   );
 }

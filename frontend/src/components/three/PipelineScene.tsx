@@ -112,7 +112,7 @@ export default function PipelineScene({
       <FloatingParticles count={300} radius={10} />
 
       {/* Offset group — shifts entire pipeline chain to the left */}
-      <group position={[-2, -0.5, 0]}>
+      <group position={[-3.5, -0.5, 0]} scale={[1.2, 1.2, 1.2]}>
         {/* Data flow connections */}
         {STEP_ORDER.slice(0, -1).map((step, i) => {
           const nextStep = STEP_ORDER[i + 1];
