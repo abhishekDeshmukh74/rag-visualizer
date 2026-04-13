@@ -2,6 +2,10 @@
 
 > An interactive open source app that shows how Retrieval-Augmented Generation works step by step — from raw text and chunking to embeddings, retrieval, prompt construction, and final LLM answer generation.
 
+## Demo
+
+[![Watch the demo](https://img.youtube.com/vi/fIpiKM4ffbM/0.jpg)](https://youtu.be/fIpiKM4ffbM?si=M0QRWS_esoTYBvDq)
+
 ## What It Does
 
 RAG Visualizer makes every stage of the RAG pipeline **visible and interactive**:
